@@ -1,177 +1,88 @@
 {% extends 'base.html' %}
 
-{% block page_title %}Institutional Analytics & Administration Dashboard{% endblock %}
-{% block page_subtitle %}Comprehensive academic overview & decision monitoring for MITS Gwalior{% endblock %}
+{% block page_title %}Academic Overview{% endblock %}
+{% block page_subtitle %}Real-time cohort telemetry & student performance indicators{% endblock %}
 
 {% block content %}
-<!-- Quick Actions Bar -->
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+<!-- Top Header & Primary Actions -->
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
   <div>
-    <h4 class="fw-bold text-dark mb-1">Executive Dashboard</h4>
-    <p class="text-muted small mb-0">Academic Session 2026–27 &bull; Real-time Database Telemetry</p>
+    <h4 class="fw-bold text-dark mb-0" style="letter-spacing: -0.02em;">Dashboard</h4>
+    <p class="text-muted small mb-0">Department of Computer Science & Engineering &bull; Session 2026–27</p>
   </div>
-  <div class="d-flex flex-wrap gap-2">
-    <a href="{{ url_for('admin.add_student') }}" class="btn btn-sm btn-navy">
-      <i class="bi bi-person-plus-fill me-1"></i> Add Student
+  <div class="d-flex align-items-center gap-2">
+    <a href="{{ url_for('admin.reports') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-file-earmark-arrow-down me-1"></i> Reports
     </a>
-    <a href="{{ url_for('admin.faculty') }}" class="btn btn-sm btn-outline-primary">
-      <i class="bi bi-person-badge me-1"></i> Add Faculty
-    </a>
-    <a href="{{ url_for('admin.subjects') }}" class="btn btn-sm btn-outline-secondary">
-      <i class="bi bi-journal-plus me-1"></i> Add Subject
-    </a>
-    <a href="{{ url_for('admin.analytics') }}" class="btn btn-sm btn-primary">
-      <i class="bi bi-bar-chart-line me-1"></i> Analytics Hub
-    </a>
-    <a href="{{ url_for('admin.reports') }}" class="btn btn-sm btn-outline-danger">
-      <i class="bi bi-file-earmark-pdf me-1"></i> Generate Dossier
+    <a href="{{ url_for('admin.add_student') }}" class="btn btn-primary btn-sm">
+      <i class="bi bi-plus-lg me-1"></i> Add Student
     </a>
   </div>
 </div>
 
-<!-- 6 KPI Stat Cards -->
+<!-- 4 Clean Stat Cards -->
 <div class="row g-3 mb-4">
-  <div class="col-sm-6 col-xl-2">
-    <div class="card kpi-card kpi-primary h-100">
-      <div class="d-flex align-items-center justify-content-between">
-        <div>
-          <div class="kpi-value">{{ summary.total_students }}</div>
-          <div class="kpi-label">Total Students</div>
-        </div>
-        <div class="kpi-icon bg-blue"><i class="bi bi-people-fill"></i></div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-card-title">Enrolled Students</div>
+      <div class="stat-card-value">{{ summary.total_students }}</div>
+      <div class="stat-card-meta">
+        <span class="stat-indicator indicator-blue"></span>
+        <span>Across {{ summary.total_subjects }} active curriculum subjects</span>
       </div>
     </div>
   </div>
 
-  <div class="col-sm-6 col-xl-2">
-    <div class="card kpi-card kpi-primary h-100">
-      <div class="d-flex align-items-center justify-content-between">
-        <div>
-          <div class="kpi-value">{{ faculty_count }}</div>
-          <div class="kpi-label">Total Faculty</div>
-        </div>
-        <div class="kpi-icon bg-blue"><i class="bi bi-person-badge-fill"></i></div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-card-title">Cohort Mean Score</div>
+      <div class="stat-card-value">{{ summary.overall_avg_percentage }}%</div>
+      <div class="stat-card-meta">
+        <span class="stat-indicator indicator-green"></span>
+        <span>Pass rate: <strong>{{ summary.overall_pass_rate }}%</strong></span>
       </div>
     </div>
   </div>
 
-  <div class="col-sm-6 col-xl-2">
-    <div class="card kpi-card kpi-primary h-100">
-      <div class="d-flex align-items-center justify-content-between">
-        <div>
-          <div class="kpi-value">{{ summary.total_subjects }}</div>
-          <div class="kpi-label">Total Subjects</div>
-        </div>
-        <div class="kpi-icon bg-blue"><i class="bi bi-journal-text"></i></div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-card-title">Average Attendance</div>
+      <div class="stat-card-value">{{ summary.avg_attendance }}%</div>
+      <div class="stat-card-meta">
+        {% if summary.avg_attendance >= 75 %}
+          <span class="status-pill pill-success" style="font-size: 0.7rem;">Good Standing</span>
+        {% else %}
+          <span class="status-pill pill-warning" style="font-size: 0.7rem;">Below 75% Target</span>
+        {% endif %}
       </div>
     </div>
   </div>
 
-  <div class="col-sm-6 col-xl-2">
-    <div class="card kpi-card kpi-primary h-100">
-      <div class="d-flex align-items-center justify-content-between">
-        <div>
-          <div class="kpi-value">{{ summary.total_marks_records }}</div>
-          <div class="kpi-label">Marks Logged</div>
-        </div>
-        <div class="kpi-icon bg-blue"><i class="bi bi-card-checklist"></i></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-sm-6 col-xl-2">
-    <div class="card kpi-card {% if summary.avg_attendance >= 75 %}kpi-success{% elif summary.avg_attendance >= 60 %}kpi-warning{% else %}kpi-danger{% endif %} h-100">
-      <div class="d-flex align-items-center justify-content-between">
-        <div>
-          <div class="kpi-value">{{ summary.avg_attendance }}%</div>
-          <div class="kpi-label">Avg Attendance</div>
-        </div>
-        <div class="kpi-icon {% if summary.avg_attendance >= 75 %}bg-green{% elif summary.avg_attendance >= 60 %}bg-amber{% else %}bg-red{% endif %}">
-          <i class="bi bi-calendar-check-fill"></i>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-sm-6 col-xl-2">
-    <div class="card kpi-card {% if high_risk_count > 0 %}kpi-danger{% else %}kpi-success{% endif %} h-100">
-      <div class="d-flex align-items-center justify-content-between">
-        <div>
-          <div class="kpi-value">{{ total_risk_count }}</div>
-          <div class="kpi-label">Students At Risk</div>
-        </div>
-        <div class="kpi-icon {% if high_risk_count > 0 %}bg-red{% else %}bg-green{% endif %}">
-          <i class="bi bi-exclamation-triangle-fill"></i>
-        </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-card-title">Attention Needed</div>
+      <div class="stat-card-value text-danger">{{ total_risk_count }}</div>
+      <div class="stat-card-meta">
+        {% if total_risk_count > 0 %}
+          <span class="stat-indicator indicator-red"></span>
+          <span class="text-danger fw-medium">{{ high_risk_count }} high priority alerts</span>
+        {% else %}
+          <span class="stat-indicator indicator-green"></span>
+          <span>No active risks detected</span>
+        {% endif %}
       </div>
     </div>
   </div>
 </div>
 
-<!-- Primary Chart Visualizations Grid -->
+<!-- Primary Visualizations (Balanced 2-Column Grid) -->
 <div class="row g-4 mb-4">
-  <!-- 1. Grade Distribution Chart -->
-  <div class="col-lg-6">
+  <!-- Performance Trajectory Line Chart -->
+  <div class="col-lg-7">
     <div class="card h-100">
       <div class="card-header d-flex align-items-center justify-content-between">
-        <span class="fw-semibold"><i class="bi bi-bar-chart me-2 text-primary"></i>Grade Tier Distribution</span>
-        <span class="badge bg-light text-dark border">Configurable Cutoffs</span>
-      </div>
-      <div class="card-body">
-        <div style="height: 260px;">
-          <canvas id="gradeDistChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 2. Subject-wise Average Chart -->
-  <div class="col-lg-6">
-    <div class="card h-100">
-      <div class="card-header d-flex align-items-center justify-content-between">
-        <span class="fw-semibold"><i class="bi bi-diagram-3 me-2 text-primary"></i>Subject Average Performance (%)</span>
-        <span class="badge bg-light text-dark border">Comparative</span>
-      </div>
-      <div class="card-body">
-        <div style="height: 260px;">
-          <canvas id="subjectAvgChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 3. Pass / Fail Donut -->
-  <div class="col-lg-4">
-    <div class="card h-100">
-      <div class="card-header d-flex align-items-center justify-content-between">
-        <span class="fw-semibold"><i class="bi bi-pie-chart me-2 text-primary"></i>Pass vs. Fail Rates</span>
-        <span class="badge badge-soft-primary">&ge; {{ PASSING_PERCENTAGE }}% Criterion</span>
-      </div>
-      <div class="card-body text-center">
-        <div style="height: 220px;">
-          <canvas id="passFailChart"></canvas>
-        </div>
-        <div class="d-flex justify-content-around mt-3 pt-2 border-top">
-          <div>
-            <div class="text-success fw-bold fs-5">{{ pass_fail.pass_rate }}%</div>
-            <small class="text-muted">Passing Rate</small>
-          </div>
-          <div class="border-start"></div>
-          <div>
-            <div class="text-danger fw-bold fs-5">{{ pass_fail.fail_rate }}%</div>
-            <small class="text-muted">Failing Rate</small>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 4. Performance Trends Over Sequential Tests -->
-  <div class="col-lg-8">
-    <div class="card h-100">
-      <div class="card-header d-flex align-items-center justify-content-between">
-        <span class="fw-semibold"><i class="bi bi-graph-up me-2 text-primary"></i>Performance Trajectory (Sequential Tests)</span>
-        <span class="badge bg-light text-dark border">Cohort & Subjects</span>
+        <span class="fw-semibold">Performance Trajectory Across Tests</span>
+        <span class="text-muted small" style="font-size: 0.78rem;">Sequential Evaluation</span>
       </div>
       <div class="card-body">
         <div style="height: 260px;">
@@ -180,127 +91,119 @@
       </div>
     </div>
   </div>
-</div>
 
-<!-- High-Priority Risk Alerts Table -->
-<div class="card mb-4 border-danger border-opacity-25 shadow-sm">
-  <div class="card-header bg-danger bg-opacity-10 d-flex align-items-center justify-content-between">
-    <div class="text-danger fw-semibold">
-      <i class="bi bi-exclamation-octagon-fill me-2"></i>Early Intervention Alerts (Students Requiring Academic Attention)
-    </div>
-    <a href="{{ url_for('admin.alerts') }}" class="btn btn-sm btn-outline-danger">View All {{ total_risk_count }} Alerts</a>
-  </div>
-  <div class="table-responsive">
-    <table class="table table-custom table-hover align-middle mb-0">
-      <thead>
-        <tr>
-          <th>Roll No</th>
-          <th>Student Name</th>
-          <th>Subject</th>
-          <th>Test</th>
-          <th>Score</th>
-          <th>Z-Score</th>
-          <th>Risk Tier</th>
-          <th>Primary Warning Reason</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% if top_alerts %}
-          {% for alert in top_alerts %}
-            <tr>
-              <td><span class="fw-semibold text-primary">{{ alert.roll_no }}</span></td>
-              <td>{{ alert.student_name }}</td>
-              <td>{{ alert.subject_code }}</td>
-              <td>Test {{ alert.test_no }}</td>
-              <td><span class="badge bg-light text-dark border">{{ alert.current_score }}</span></td>
-              <td><code>{{ alert.z_score }}</code></td>
-              <td>
-                <span class="badge badge-soft-{{ alert.badge_color }}">{{ alert.risk_level }}</span>
-              </td>
-              <td><small class="text-muted">{{ alert.reason }}</small></td>
-              <td>
-                <a href="{{ url_for('admin.student_profile', student_id=alert.student_id) }}" class="btn btn-sm btn-light border py-1 px-2" title="Inspect Student Dossier">
-                  <i class="bi bi-eye"></i>
-                </a>
-              </td>
-            </tr>
-          {% endfor %}
-        {% else %}
-          <tr>
-            <td colspan="9" class="text-center py-4 text-muted">
-              <i class="bi bi-shield-check text-success fs-3 d-block mb-1"></i>
-              No severe academic anomalies detected across current student cohorts.
-            </td>
-          </tr>
-        {% endif %}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Recent Records & Audit Stream -->
-<div class="row g-4">
-  <!-- Recent Student Additions -->
-  <div class="col-lg-6">
+  <!-- Grade Distribution Chart -->
+  <div class="col-lg-5">
     <div class="card h-100">
       <div class="card-header d-flex align-items-center justify-content-between">
-        <span class="fw-semibold"><i class="bi bi-person-check me-2 text-primary"></i>Recently Enrolled Students</span>
-        <a href="{{ url_for('admin.students') }}" class="small text-decoration-none">View All</a>
+        <span class="fw-semibold">Grade Tier Distribution</span>
+        <span class="text-muted small" style="font-size: 0.78rem;">A &ge; 75%, B &ge; 60%, C &ge; 40%</span>
+      </div>
+      <div class="card-body">
+        <div style="height: 260px;">
+          <canvas id="gradeDistChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Actionable Section: At-Risk Intervention & Recent Stream -->
+<div class="row g-4">
+  <!-- Students Requiring Attention Table -->
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div>
+          <span class="fw-semibold text-danger"><i class="bi bi-exclamation-circle-fill me-1"></i> Early Warning Alerts</span>
+          <small class="text-muted d-block" style="font-size: 0.75rem;">Students flagged for score drops or low Z-scores</small>
+        </div>
+        <a href="{{ url_for('admin.alerts') }}" class="btn btn-sm btn-outline-secondary py-1" style="font-size: 0.78rem;">
+          View All ({{ total_risk_count }})
+        </a>
       </div>
       <div class="table-responsive">
-        <table class="table table-custom table-hover mb-0">
+        <table class="table table-custom table-hover align-middle mb-0">
           <thead>
             <tr>
-              <th>Roll No</th>
-              <th>Name</th>
-              <th>Sem / Sec</th>
-              <th>Action</th>
+              <th>Student</th>
+              <th>Course</th>
+              <th>Score</th>
+              <th>Status</th>
+              <th class="text-end">Action</th>
             </tr>
           </thead>
           <tbody>
-            {% for s in recent_students %}
+            {% if top_alerts %}
+              {% for a in top_alerts[:4] %}
+                <tr>
+                  <td>
+                    <div class="fw-semibold text-dark">{{ a.student_name }}</div>
+                    <small class="text-muted">{{ a.roll_no }}</small>
+                  </td>
+                  <td>
+                    <span class="status-pill pill-neutral">{{ a.subject_code }} &bull; T{{ a.test_no }}</span>
+                  </td>
+                  <td>
+                    <span class="fw-medium text-dark">{{ a.current_score.split(' ')[0] }}</span>
+                  </td>
+                  <td>
+                    {% if a.risk_level == 'High Risk' %}
+                      <span class="status-pill pill-danger">High Risk</span>
+                    {% else %}
+                      <span class="status-pill pill-warning">Review</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <a href="{{ url_for('admin.student_profile', student_id=a.student_id) }}" class="btn btn-sm btn-light border py-1 px-2" title="Inspect Profile">
+                      <i class="bi bi-arrow-right"></i>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
               <tr>
-                <td><strong>{{ s.roll_no }}</strong></td>
-                <td>{{ s.name }}</td>
-                <td>Sem {{ s.semester }}-{{ s.section }}</td>
-                <td>
-                  <a href="{{ url_for('admin.student_profile', student_id=s.student_id) }}" class="btn btn-sm btn-light border py-0 px-2">
-                    Profile
-                  </a>
+                <td colspan="5" class="text-center py-4 text-muted">
+                  <i class="bi bi-check-circle text-success fs-4 d-block mb-1"></i>
+                  All students currently in good academic standing.
                 </td>
               </tr>
-            {% else %}
-              <tr><td colspan="4" class="text-center py-3 text-muted">No student records enrolled.</td></tr>
-            {% endfor %}
+            {% endif %}
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- Recent Audit Logs -->
-  <div class="col-lg-6">
+  <!-- Recent Activity Feed -->
+  <div class="col-lg-5">
     <div class="card h-100">
       <div class="card-header d-flex align-items-center justify-content-between">
-        <span class="fw-semibold"><i class="bi bi-clock-history me-2 text-primary"></i>Recent System Audit Logs</span>
-        <a href="{{ url_for('admin.audit_logs') }}" class="small text-decoration-none">Full Log</a>
+        <span class="fw-semibold">System Activity</span>
+        <a href="{{ url_for('admin.audit_logs') }}" class="text-muted small text-decoration-none" style="font-size: 0.78rem;">
+          Audit Trail &rarr;
+        </a>
       </div>
       <div class="card-body p-0">
-        <ul class="list-group list-group-flush" style="font-size: 0.85rem;">
-          {% for log in recent_logs %}
-            <li class="list-group-item d-flex justify-content-between align-items-start py-2 px-3">
-              <div>
-                <span class="badge bg-secondary me-1">{{ log.module }}</span>
-                <span class="fw-semibold text-dark">{{ log.action }}</span>
-                <div class="text-muted small text-truncate" style="max-width: 320px;">{{ log.description }}</div>
+        <div class="list-group list-group-flush" style="font-size: 0.84rem;">
+          {% for log in recent_logs[:5] %}
+            <div class="list-group-item d-flex align-items-center justify-content-between py-2 px-3 border-0 border-bottom">
+              <div class="d-flex align-items-center gap-2 overflow-hidden">
+                <span class="status-pill pill-neutral" style="font-size: 0.7rem; padding: 0.15rem 0.45rem;">
+                  {{ log.module }}
+                </span>
+                <span class="text-truncate text-dark fw-medium" style="max-width: 220px;">
+                  {{ log.description }}
+                </span>
               </div>
-              <small class="text-muted">{{ log.timestamp.strftime('%H:%M %d/%m') }}</small>
-            </li>
+              <small class="text-muted text-nowrap" style="font-size: 0.72rem;">
+                {{ log.timestamp.strftime('%H:%M') }}
+              </small>
+            </div>
           {% else %}
-            <li class="list-group-item text-center py-3 text-muted">No audit activity logged yet.</li>
+            <div class="p-3 text-center text-muted small">No activity logged yet.</div>
           {% endfor %}
-        </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -310,22 +213,12 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // 1. Grade Distribution
+    // 1. Grade Distribution Chart
     const gradeLabels = {{ grade_dist.labels|tojson }};
     const gradeCounts = {{ grade_dist.counts|tojson }};
     MITSCharts.createGradeDistributionChart('gradeDistChart', gradeLabels, gradeCounts);
 
-    // 2. Subject Averages
-    const subjLabels = {{ subject_avg.labels|tojson }};
-    const subjAverages = {{ subject_avg.averages|tojson }};
-    MITSCharts.createSubjectAveragesChart('subjectAvgChart', subjLabels, subjAverages);
-
-    // 3. Pass Fail Donut
-    const passedCount = {{ pass_fail.passed }};
-    const failedCount = {{ pass_fail.failed }};
-    MITSCharts.createPassFailChart('passFailChart', passedCount, failedCount);
-
-    // 4. Performance Trends Line
+    // 2. Performance Trends Line Chart
     const trendLabels = {{ trends.labels|tojson }};
     const trendDatasets = {{ trends.datasets|tojson }};
     MITSCharts.createPerformanceTrendChart('performanceTrendChart', trendLabels, trendDatasets);

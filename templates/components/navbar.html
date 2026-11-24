@@ -1,43 +1,39 @@
 <header class="app-topbar">
-  <div class="topbar-left">
+  <div class="d-flex align-items-center gap-3">
     <button class="btn btn-sm btn-outline-secondary d-lg-none" id="sidebarToggleBtn" type="button" aria-label="Toggle navigation">
       <i class="bi bi-list fs-5"></i>
     </button>
     <div>
-      <h1 class="topbar-title">{% block page_title %}Academic Performance Analytics & SRMS{% endblock %}</h1>
+      <h1 class="topbar-title">{% block page_title %}Dashboard{% endblock %}</h1>
       <p class="topbar-subtitle d-none d-md-block">{% block page_subtitle %}Madhav Institute of Technology & Science, Gwalior{% endblock %}</p>
     </div>
   </div>
 
-  <div class="topbar-right">
-    <div class="d-none d-sm-flex align-items-center gap-2 me-2">
-      <span class="badge bg-light text-dark border">
-        <i class="bi bi-building me-1 text-primary"></i> MITS Gwalior
-      </span>
-      <span class="badge badge-soft-primary text-uppercase">
-        {{ session.get('role', 'Guest') }}
-      </span>
-    </div>
+  <div class="d-flex align-items-center gap-3">
+    <span class="status-pill pill-neutral d-none d-sm-inline-flex" style="text-transform: capitalize;">
+      <span class="stat-indicator indicator-blue"></span>
+      {{ session.get('role', 'User') }}
+    </span>
 
-    <!-- User Menu -->
+    <!-- User Profile Dropdown -->
     <div class="dropdown">
-      <button class="btn btn-light d-flex align-items-center gap-2 border dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <div class="avatar-circle" style="width: 28px; height: 28px; font-size: 0.8rem;">
+      <button class="btn btn-light d-flex align-items-center gap-2 border dropdown-toggle py-1 px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="avatar-circle" style="width: 26px; height: 26px; font-size: 0.75rem;">
           {{ (session.get('faculty_name') or session.get('username') or 'U')[0]|upper }}
         </div>
-        <span class="d-none d-md-inline fw-medium text-dark" style="font-size: 0.875rem;">
+        <span class="d-none d-md-inline text-dark fw-medium" style="font-size: 0.82rem;">
           {{ session.get('faculty_name') or session.get('username') }}
         </span>
       </button>
-      <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm border" style="font-size: 0.85rem;">
         <li class="px-3 py-2 border-bottom">
           <div class="fw-semibold text-dark">{{ session.get('faculty_name') or session.get('username') }}</div>
-          <small class="text-muted text-capitalize">Signed in as {{ session.get('role') }}</small>
+          <small class="text-muted text-capitalize">{{ session.get('role') }} account</small>
         </li>
         {% if session.get('role') == 'student' %}
           <li><a class="dropdown-item py-2" href="{{ url_for('student.profile') }}"><i class="bi bi-person me-2"></i>My Profile</a></li>
         {% endif %}
-        <li><hr class="dropdown-divider"></li>
+        <li><hr class="dropdown-divider my-1"></li>
         <li>
           <a class="dropdown-item py-2 text-danger" href="{{ url_for('auth.logout') }}">
             <i class="bi bi-box-arrow-right me-2"></i>Sign Out

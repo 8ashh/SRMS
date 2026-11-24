@@ -1,118 +1,69 @@
 {% extends 'base.html' %}
 
-{% block page_title %}Predictive Grade Modelling{% endblock %}
-{% block page_subtitle %}Machine Learning forecasts powered by Scikit-Learn (Linear & Random Forest Regression){% endblock %}
+{% block page_title %}Grade Predictions{% endblock %}
+{% block page_subtitle %}Final performance forecasting via Scikit-Learn regression models{% endblock %}
 
 {% block content %}
-<!-- Model Diagnostics Card -->
-<div class="card mb-4 shadow-sm border-primary border-opacity-25">
-  <div class="card-header bg-primary bg-opacity-10 d-flex flex-wrap align-items-center justify-content-between py-3">
-    <div>
-      <h5 class="fw-bold text-primary mb-0">
-        <i class="bi bi-cpu-fill me-2"></i>Active Regressor: {{ metadata.model_name }}
-      </h5>
-      <small class="text-muted">Training Corpus: {{ metadata.data_source }}</small>
+<!-- Model Summary Bar -->
+<div class="card mb-4">
+  <div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <div class="d-flex align-items-center gap-3">
+      <div class="avatar-circle">
+        <i class="bi bi-cpu"></i>
+      </div>
+      <div>
+        <div class="fw-semibold text-dark">{{ metadata.model_name }}</div>
+        <small class="text-muted">
+          Mean Absolute Error (MAE): <strong>{{ metadata.mae }}</strong> &bull; 
+          R&sup2; Score: <strong>{{ metadata.r2_score }}</strong> &bull; 
+          Sample: {{ metadata.sample_size }} records
+        </small>
+      </div>
     </div>
-    <!-- Model Re-training Modal Trigger -->
-    <button type="button" class="btn btn-sm btn-navy" data-bs-toggle="modal" data-bs-target="#trainModelModal">
-      <i class="bi bi-gear-fill me-1"></i> Retrain / Configure Model
+    <button type="button" class="btn btn-navy btn-sm" data-bs-toggle="modal" data-bs-target="#trainModelModal">
+      <i class="bi bi-sliders me-1"></i> Configure Model
     </button>
-  </div>
-  <div class="card-body">
-    <div class="row g-3">
-      <div class="col-md-3">
-        <div class="p-3 bg-light rounded text-center border">
-          <small class="text-muted fw-semibold d-block">EVALUATION METRIC (MAE)</small>
-          <span class="fs-4 fw-bold text-dark">{{ metadata.mae }}</span>
-          <small class="text-muted d-block" style="font-size: 0.75rem;">Mean Absolute Error</small>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="p-3 bg-light rounded text-center border">
-          <small class="text-muted fw-semibold d-block">DETERMINATION (R&sup2; SCORE)</small>
-          <span class="fs-4 fw-bold text-success">{{ metadata.r2_score }}</span>
-          <small class="text-muted d-block" style="font-size: 0.75rem;">Explained Variance</small>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="p-3 bg-light rounded text-center border">
-          <small class="text-muted fw-semibold d-block">SAMPLE COHORT SIZE</small>
-          <span class="fs-4 fw-bold text-dark">{{ metadata.sample_size }}</span>
-          <small class="text-muted d-block" style="font-size: 0.75rem;">80% Train ({{ metadata.train_size }}) / 20% Test ({{ metadata.test_size }})</small>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="p-3 bg-light rounded text-center border">
-          <small class="text-muted fw-semibold d-block">DATASET INTEGRITY</small>
-          {% if metadata.is_demo %}
-            <span class="badge bg-warning text-dark mt-1">Synthetic Demo Mode</span>
-            <small class="text-muted d-block" style="font-size: 0.7rem;">Labelled Viva Benchmark</small>
-          {% else %}
-            <span class="badge bg-success mt-1">Empirical SQLite Records</span>
-            <small class="text-muted d-block" style="font-size: 0.7rem;">Trained on Database</small>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <!-- Comparative Table -->
-    {% if metadata.comparison %}
-      <div class="mt-3 pt-3 border-top d-flex align-items-center justify-content-between small text-muted">
-        <div>
-          <strong>Model Benchmark Comparison:</strong> 
-          Linear Regression (MAE: {{ metadata.comparison.linear_regression.mae }}, R&sup2;: {{ metadata.comparison.linear_regression.r2 }}) vs. 
-          Random Forest (MAE: {{ metadata.comparison.random_forest.mae }}, R&sup2;: {{ metadata.comparison.random_forest.r2 }})
-        </div>
-        <span class="badge bg-secondary">Scikit-Learn Regression Pipeline</span>
-      </div>
-    {% endif %}
   </div>
 </div>
 
 <!-- Retrain Modal -->
 <div class="modal fade" id="trainModelModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form method="POST" action="{{ url_for('admin.predictions') }}">
-        <div class="modal-header">
-          <h5 class="modal-title fw-bold">Configure Predictive ML Regressor</h5>
+        <div class="modal-header py-3">
+          <h6 class="modal-title fw-semibold">Configure Predictive Model</h6>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body p-3">
           <div class="mb-3">
-            <label class="form-label fw-semibold small">ALGORITHM ARCHITECTURE</label>
-            <select class="form-select" name="model_type">
-              <option value="linear" {% if metadata.model_type == 'linear' %}selected{% endif %}>Linear Regression (Default Baseline)</option>
-              <option value="random_forest" {% if metadata.model_type == 'random_forest' %}selected{% endif %}>Random Forest Regressor (Ensemble Trees)</option>
+            <label class="form-label">Algorithm Architecture</label>
+            <select class="form-select form-select-sm" name="model_type">
+              <option value="linear" {% if metadata.model_type == 'linear' %}selected{% endif %}>Linear Regression</option>
+              <option value="random_forest" {% if metadata.model_type == 'random_forest' %}selected{% endif %}>Random Forest Regressor</option>
             </select>
           </div>
-          <div class="form-check mb-3">
+          <div class="form-check mb-2">
             <input class="form-check-input" type="checkbox" name="force_demo" value="1" id="forceDemoCheck" checked>
-            <label class="form-check-label small" for="forceDemoCheck">
-              Use clearly labelled synthetic demonstration dataset (N=120) for college viva demonstration.
+            <label class="form-check-label small text-muted" for="forceDemoCheck">
+              Use synthetic benchmark dataset (N=120) for college viva demo
             </label>
           </div>
-          <div class="alert alert-light border small text-muted">
-            <i class="bi bi-info-circle text-primary me-1"></i>
-            Features used: <code>midterm_score</code> (Continuous Assessments) and <code>attendance_rate</code> (Percentage).
-          </div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer py-2">
           <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary btn-sm">Train & Validate Model</button>
+          <button type="submit" class="btn btn-primary btn-sm">Train Model</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-<!-- Student Forecasts Table -->
-<div class="card shadow-sm mb-4">
-  <div class="card-header bg-white d-flex align-items-center justify-content-between py-3">
-    <h5 class="fw-bold text-dark mb-0">
-      <i class="bi bi-award-fill text-primary me-2"></i>Cohort Estimated Grade Forecasts
-    </h5>
-    <span class="badge bg-light text-dark border">{{ predictions|length }} Forecasts Available</span>
+<!-- Predictions Table -->
+<div class="card">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <span class="fw-semibold">Forecasted Student Outcomes</span>
+    <span class="text-muted small">{{ predictions|length }} predictions</span>
   </div>
   <div class="table-responsive">
     <table class="table table-custom table-hover align-middle mb-0">
@@ -122,10 +73,10 @@
           <th>Student Name</th>
           <th>Semester</th>
           <th>Mid-Term Avg</th>
-          <th>Attendance Rate</th>
-          <th>Estimated Final %</th>
+          <th>Attendance</th>
+          <th>Predicted Score</th>
           <th>Predicted Grade</th>
-          <th class="text-end">Dossier</th>
+          <th class="text-end">Action</th>
         </tr>
       </thead>
       <tbody>
@@ -133,42 +84,41 @@
           {% for p in predictions %}
             <tr>
               <td>
-                <a href="{{ url_for('admin.student_profile', student_id=p.student_id) }}" class="fw-bold text-primary text-decoration-none">
+                <a href="{{ url_for('admin.student_profile', student_id=p.student_id) }}" class="fw-semibold text-primary text-decoration-none">
                   {{ p.roll_no }}
                 </a>
               </td>
               <td><strong>{{ p.student_name }}</strong></td>
               <td>Sem {{ p.semester }}-{{ p.section }}</td>
               <td>{{ p.midterm_avg }}%</td>
+              <td>{{ p.attendance_rate }}%</td>
+              <td><span class="fw-bold text-dark">{{ p.predicted_score }}%</span></td>
               <td>
-                <span class="badge badge-soft-primary">{{ p.attendance_rate }}%</span>
-              </td>
-              <td>
-                <span class="fw-bold fs-6 text-dark">{{ p.predicted_score }}%</span>
-              </td>
-              <td>
-                <span class="badge badge-soft-{{ p.badge_class }} fs-6 px-3">
-                  Grade {{ p.predicted_grade }}
-                </span>
+                {% if p.predicted_grade == 'A' %}
+                  <span class="status-pill pill-success">Grade A</span>
+                {% elif p.predicted_grade == 'B' %}
+                  <span class="status-pill pill-blue">Grade B</span>
+                {% elif p.predicted_grade == 'C' %}
+                  <span class="status-pill pill-warning">Grade C</span>
+                {% else %}
+                  <span class="status-pill pill-danger">Grade F</span>
+                {% endif %}
               </td>
               <td class="text-end">
-                <a href="{{ url_for('admin.student_profile', student_id=p.student_id) }}" class="btn btn-sm btn-outline-primary" title="View Dossier">
-                  <i class="bi bi-eye"></i>
+                <a href="{{ url_for('admin.student_profile', student_id=p.student_id) }}" class="btn btn-sm btn-outline-secondary py-1 px-2">
+                  <i class="bi bi-arrow-right"></i>
                 </a>
               </td>
             </tr>
           {% endfor %}
         {% else %}
-          <tr>
-            <td colspan="8" class="text-center py-4 text-muted">No student predictions available. Ensure test marks and attendance are recorded.</td>
-          </tr>
+          <tr><td colspan="8" class="text-center py-4 text-muted">No predictions generated yet.</td></tr>
         {% endif %}
       </tbody>
     </table>
   </div>
-  <div class="card-footer bg-light py-2 text-muted small text-center">
-    <i class="bi bi-shield-exclamation text-warning me-1"></i>
-    <strong>Academic Disclaimer:</strong> Estimated grades are decision-support indicators generated via supervised statistical regression. They are not official final semester examination results.
+  <div class="card-footer bg-light py-2 text-muted small text-center" style="font-size: 0.76rem;">
+    Estimations are decision-support indicators, not official final semester examination results.
   </div>
 </div>
 {% endblock %}

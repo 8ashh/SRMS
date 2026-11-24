@@ -1,92 +1,111 @@
 {% extends 'base.html' %}
 
-{% block page_title %}Student Academic Portal{% endblock %}
+{% block page_title %}Student Portal{% endblock %}
 {% block page_subtitle %}Personal marks, attendance & predictive academic monitoring{% endblock %}
 
 {% block content %}
-<!-- Welcome Banner -->
-<div class="card mb-4 bg-navy text-white shadow-sm border-0" style="background: linear-gradient(135deg, #172554 0%, #1E3A8A 100%);">
-  <div class="card-body p-4">
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-      <div>
-        <span class="badge bg-light text-dark mb-2">Student Portal</span>
-        <h3 class="fw-bold text-white mb-1">Welcome back, {{ student.name }}!</h3>
-        <p class="text-light opacity-75 mb-0">
-          Roll Number: <strong>{{ student.roll_no }}</strong> &bull; Semester {{ student.semester }} (Section {{ student.section }}) &bull; MITS Gwalior
-        </p>
-      </div>
-      <div class="d-flex gap-2">
-        <a href="{{ url_for('reports.student_pdf', student_id=student.student_id) }}" class="btn btn-danger btn-sm shadow-sm">
-          <i class="bi bi-file-earmark-pdf me-1"></i> My PDF Dossier
-        </a>
-        <a href="{{ url_for('reports.student_csv', student_id=student.student_id) }}" class="btn btn-outline-light btn-sm">
-          <i class="bi bi-file-earmark-spreadsheet me-1"></i> CSV
-        </a>
-      </div>
+<!-- Welcome Header -->
+<div class="card mb-4 border-0" style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); color: #FFFFFF;">
+  <div class="card-body p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <div>
+      <span class="status-pill pill-blue mb-2 text-white" style="background-color: rgba(37, 99, 235, 0.4); border-color: rgba(255, 255, 255, 0.1);">Student Portal</span>
+      <h3 class="fw-bold text-white mb-1" style="letter-spacing: -0.02em;">Welcome back, {{ student.name }}</h3>
+      <p class="text-light opacity-75 small mb-0">
+        Roll No: <strong>{{ student.roll_no }}</strong> &bull; Semester {{ student.semester }} (Section {{ student.section }}) &bull; MITS Gwalior
+      </p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <a href="{{ url_for('reports.student_pdf', student_id=student.student_id) }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF Dossier
+      </a>
+      <a href="{{ url_for('reports.student_csv', student_id=student.student_id) }}" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-file-earmark-spreadsheet me-1"></i> CSV
+      </a>
     </div>
   </div>
 </div>
 
-<!-- Student KPI Cards -->
+<!-- 4 Clean Stat Cards -->
 <div class="row g-3 mb-4">
-  <div class="col-md-3">
-    <div class="card kpi-card kpi-primary h-100">
-      <div class="kpi-value">{{ analytics.avg_percentage }}%</div>
-      <div class="kpi-label">Overall Average</div>
-      <small class="text-muted">{{ analytics.total_tests_taken }} Assessments Logged</small>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-card-title">Overall Average</div>
+      <div class="stat-card-value">{{ analytics.avg_percentage }}%</div>
+      <div class="stat-card-meta"><span class="stat-indicator indicator-blue"></span> Across {{ analytics.total_tests_taken }} tests</div>
     </div>
   </div>
 
-  <div class="col-md-3">
-    <div class="card kpi-card kpi-{{ att_info.badge_class }} h-100">
-      <div class="kpi-value">{{ att_info.percentage }}%</div>
-      <div class="kpi-label">Class Attendance</div>
-      <small class="text-muted">{{ att_info.present }}/{{ att_info.total }} Classes ({{ att_info.status_label }})</small>
-    </div>
-  </div>
-
-  <div class="col-md-3">
-    <div class="card kpi-card {% if prediction.status == 'success' %}kpi-{{ prediction.badge_class }}{% else %}kpi-primary{% endif %} h-100">
-      <div class="kpi-value">
-        {% if prediction.status == 'success' %}Grade {{ prediction.predicted_grade }}{% else %}N/A{% endif %}
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-card-title">Class Attendance</div>
+      <div class="stat-card-value">{{ att_info.percentage }}%</div>
+      <div class="stat-card-meta">
+        <span class="stat-indicator {% if att_info.percentage >= 75 %}indicator-green{% elif att_info.percentage >= 60 %}indicator-amber{% else %}indicator-red{% endif %}"></span>
+        <span>{{ att_info.present }}/{{ att_info.total }} classes attended</span>
       </div>
-      <div class="kpi-label">Predicted Final Grade</div>
-      <small class="text-muted">
-        {% if prediction.status == 'success' %}Forecast: {{ prediction.predicted_score }}%{% else %}Data Pending{% endif %}
-      </small>
     </div>
   </div>
 
-  <div class="col-md-3">
-    <div class="card kpi-card {% if alerts %}kpi-danger{% else %}kpi-success{% endif %} h-100">
-      <div class="kpi-value">{{ alerts|length }}</div>
-      <div class="kpi-label">Academic Alerts</div>
-      <small class="text-muted">{% if alerts %}Review Needed{% else %}Good Standing{% endif %}</small>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-card-title">Predicted Grade</div>
+      <div class="stat-card-value">
+        {% if prediction.status == 'success' %}
+          Grade {{ prediction.predicted_grade }}
+        {% else %}
+          N/A
+        {% endif %}
+      </div>
+      <div class="stat-card-meta">
+        <span class="stat-indicator indicator-blue"></span>
+        <span>{% if prediction.status == 'success' %}Forecast: {{ prediction.predicted_score }}%{% else %}Data pending{% endif %}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-card-title">Academic Standing</div>
+      <div class="stat-card-value {% if alerts %}text-danger{% else %}text-success{% endif %}">
+        {% if alerts %}Review{% else %}Good{% endif %}
+      </div>
+      <div class="stat-card-meta">
+        {% if alerts %}
+          <span class="stat-indicator indicator-red"></span>
+          <span class="text-danger fw-medium">{{ alerts|length }} subject alerts</span>
+        {% else %}
+          <span class="stat-indicator indicator-green"></span>
+          <span>No active warnings</span>
+        {% endif %}
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Active Risk Alerts (if any) -->
+<!-- Active Alerts Advisory if any -->
 {% if alerts %}
-  <div class="alert alert-warning shadow-sm border-warning border-opacity-25 mb-4">
-    <div class="d-flex align-items-center gap-2 mb-2">
-      <i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>
-      <h6 class="fw-bold mb-0 text-dark">Academic Monitoring Advisory</h6>
+  <div class="card border-warning border-opacity-25 bg-warning bg-opacity-10 mb-4">
+    <div class="card-body p-3">
+      <div class="d-flex align-items-center gap-2 mb-2 text-dark fw-semibold">
+        <i class="bi bi-info-circle text-warning fs-5"></i>
+        <span>Academic Progress Advisory</span>
+      </div>
+      <ul class="mb-0 ps-3 small text-dark">
+        {% for a in alerts %}
+          <li><strong>{{ a.subject_code }} (Test {{ a.test_no }}):</strong> {{ a.reason }}</li>
+        {% endfor %}
+      </ul>
     </div>
-    <p class="small text-muted mb-2">Our early-warning analytics identified the following areas where performance or attendance requires your attention:</p>
-    <ul class="mb-0 ps-3 small text-dark">
-      {% for alert in alerts %}
-        <li><strong>{{ alert.subject_code }} (Test {{ alert.test_no }}):</strong> {{ alert.reason }}</li>
-      {% endfor %}
-    </ul>
   </div>
 {% endif %}
 
-<!-- Charts -->
-<div class="row g-4 mb-4">
-  <div class="col-lg-6">
-    <div class="card shadow-sm h-100">
-      <div class="card-header bg-white"><h6 class="fw-bold mb-0">My Performance Over Sequential Tests</h6></div>
+<!-- Test Trajectory & Assessment Ledger -->
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header">
+        <span class="fw-semibold">Test Performance Trajectory</span>
+      </div>
       <div class="card-body">
         <div style="height: 250px;">
           <canvas id="studentTrendCanvas"></canvas>
@@ -95,59 +114,48 @@
     </div>
   </div>
 
-  <div class="col-lg-6">
-    <div class="card shadow-sm h-100">
-      <div class="card-header bg-white"><h6 class="fw-bold mb-0">Subject-wise Average Marks (%)</h6></div>
-      <div class="card-body">
-        <div style="height: 250px;">
-          <canvas id="studentSubjectCanvas"></canvas>
-        </div>
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <span class="fw-semibold">Recent Assessment Marks</span>
+        <a href="{{ url_for('student.marks') }}" class="text-muted small text-decoration-none">View All &rarr;</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-custom table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th>Test</th>
+              <th>Score</th>
+              <th>Percentage</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in marks %}
+              <tr>
+                <td>
+                  <div class="fw-medium text-dark">{{ m.subject.code }}</div>
+                  <small class="text-muted" style="font-size: 0.72rem;">{{ m.subject.name[:25] }}</small>
+                </td>
+                <td>Test {{ m.test_no }}</td>
+                <td><strong>{{ m.score }}</strong> / {{ m.max_score }}</td>
+                <td><span class="fw-semibold text-dark">{{ m.percentage }}%</span></td>
+                <td>
+                  {% if m.percentage >= PASSING_PERCENTAGE %}
+                    <span class="status-pill pill-success">Pass</span>
+                  {% else %}
+                    <span class="status-pill pill-danger">Fail</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="5" class="text-center py-4 text-muted">No assessment scores recorded yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- Marks Overview Table -->
-<div class="card shadow-sm mb-4">
-  <div class="card-header bg-white d-flex align-items-center justify-content-between">
-    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-award me-2 text-primary"></i>My Assessment Scores</h5>
-    <a href="{{ url_for('student.marks') }}" class="btn btn-sm btn-outline-primary">View Full Ledger</a>
-  </div>
-  <div class="table-responsive">
-    <table class="table table-custom table-hover align-middle mb-0">
-      <thead>
-        <tr>
-          <th>Subject Code</th>
-          <th>Subject Name</th>
-          <th>Test</th>
-          <th>Score Obtained</th>
-          <th>Maximum Marks</th>
-          <th>Percentage</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for m in marks %}
-          <tr>
-            <td><strong>{{ m.subject.code }}</strong></td>
-            <td>{{ m.subject.name }}</td>
-            <td>Test {{ m.test_no }}</td>
-            <td><strong>{{ m.score }}</strong></td>
-            <td>{{ m.max_score }}</td>
-            <td><span class="badge {% if m.percentage >= 75 %}badge-soft-success{% elif m.percentage >= PASSING_PERCENTAGE %}badge-soft-primary{% else %}badge-soft-danger{% endif %}">{{ m.percentage }}%</span></td>
-            <td>
-              {% if m.percentage >= PASSING_PERCENTAGE %}
-                <span class="badge badge-soft-success">Pass</span>
-              {% else %}
-                <span class="badge badge-soft-danger">Fail</span>
-              {% endif %}
-            </td>
-          </tr>
-        {% else %}
-          <tr><td colspan="7" class="text-center py-4 text-muted">No assessment scores recorded.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
   </div>
 </div>
 {% endblock %}
@@ -164,18 +172,11 @@
           label: 'My Score (%)',
           data: trend.scores,
           borderColor: '#2563EB',
-          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          backgroundColor: 'rgba(37, 99, 235, 0.08)',
           fill: true,
           tension: 0.3
         }]
       );
-    }
-
-    const subPerf = {{ analytics.subject_performance|tojson }};
-    if (subPerf && subPerf.length > 0) {
-      const labels = subPerf.map(s => s.subject_code);
-      const avgs = subPerf.map(s => s.avg_pct);
-      MITSCharts.createSubjectAveragesChart('studentSubjectCanvas', labels, avgs);
     }
   });
 </script>

@@ -1,64 +1,64 @@
 <div class="app-sidebar" id="appSidebar">
   <!-- Brand Header -->
   <div class="sidebar-brand">
-    <div class="d-flex align-items-center justify-content-center bg-primary rounded p-2 text-white">
-      <i class="bi bi-mortarboard-fill fs-5"></i>
+    <div class="brand-icon">
+      <i class="bi bi-mortarboard-fill"></i>
     </div>
-    <div>
-      <h5>MITS GWALIOR</h5>
-      <small>Academic Analytics & SRMS</small>
+    <div class="brand-text">
+      <h5>MITS Gwalior</h5>
+      <small>Academic SRMS</small>
     </div>
   </div>
 
   <!-- Navigation Menu -->
   <div class="sidebar-menu">
     {% if session.get('role') == 'admin' %}
-      <div class="sidebar-heading">Main Overview</div>
+      <div class="sidebar-heading">Overview</div>
       <a href="{{ url_for('admin.dashboard') }}" class="nav-link sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
-        <i class="bi bi-speedometer2"></i>
-        <span>Admin Dashboard</span>
+        <i class="bi bi-grid-1x2"></i>
+        <span>Dashboard</span>
       </a>
 
-      <div class="sidebar-heading">Academic Management</div>
+      <div class="sidebar-heading">Management</div>
       <a href="{{ url_for('admin.students') }}" class="nav-link sidebar-link {% if 'student' in request.endpoint and request.endpoint != 'admin.dashboard' %}active{% endif %}">
         <i class="bi bi-people"></i>
         <span>Students</span>
       </a>
       <a href="{{ url_for('admin.faculty') }}" class="nav-link sidebar-link {% if request.endpoint == 'admin.faculty' %}active{% endif %}">
         <i class="bi bi-person-badge"></i>
-        <span>Faculty Accounts</span>
+        <span>Faculty</span>
       </a>
       <a href="{{ url_for('admin.subjects') }}" class="nav-link sidebar-link {% if request.endpoint == 'admin.subjects' %}active{% endif %}">
-        <i class="bi bi-journal-bookmark"></i>
+        <i class="bi bi-journal-text"></i>
         <span>Subjects</span>
       </a>
       <a href="{{ url_for('admin.marks') }}" class="nav-link sidebar-link {% if request.endpoint == 'admin.marks' %}active{% endif %}">
         <i class="bi bi-award"></i>
-        <span>Marks Records</span>
+        <span>Marks</span>
       </a>
       <a href="{{ url_for('admin.attendance') }}" class="nav-link sidebar-link {% if request.endpoint == 'admin.attendance' %}active{% endif %}">
         <i class="bi bi-calendar-check"></i>
         <span>Attendance</span>
       </a>
 
-      <div class="sidebar-heading">Decision Intelligence</div>
+      <div class="sidebar-heading">Analytics & Risk</div>
       <a href="{{ url_for('admin.analytics') }}" class="nav-link sidebar-link {% if request.endpoint == 'admin.analytics' %}active{% endif %}">
-        <i class="bi bi-bar-chart-line"></i>
-        <span>Academic Analytics</span>
+        <i class="bi bi-bar-chart"></i>
+        <span>Analytics</span>
       </a>
       <a href="{{ url_for('admin.alerts') }}" class="nav-link sidebar-link {% if request.endpoint == 'admin.alerts' %}active{% endif %}">
         <i class="bi bi-exclamation-triangle"></i>
-        <span>Anomaly Alerts</span>
+        <span>Risk Alerts</span>
       </a>
       <a href="{{ url_for('admin.predictions') }}" class="nav-link sidebar-link {% if request.endpoint == 'admin.predictions' %}active{% endif %}">
         <i class="bi bi-cpu"></i>
-        <span>Grade Predictions</span>
+        <span>Predictions</span>
       </a>
 
-      <div class="sidebar-heading">System & Reports</div>
+      <div class="sidebar-heading">System</div>
       <a href="{{ url_for('admin.reports') }}" class="nav-link sidebar-link {% if request.endpoint == 'admin.reports' %}active{% endif %}">
-        <i class="bi bi-file-earmark-pdf"></i>
-        <span>Reports & Exports</span>
+        <i class="bi bi-file-earmark-arrow-down"></i>
+        <span>Reports</span>
       </a>
       <a href="{{ url_for('admin.audit_logs') }}" class="nav-link sidebar-link {% if request.endpoint == 'admin.audit_logs' %}active{% endif %}">
         <i class="bi bi-clock-history"></i>
@@ -66,33 +66,33 @@
       </a>
 
     {% elif session.get('role') == 'faculty' %}
-      <div class="sidebar-heading">Faculty Portal</div>
+      <div class="sidebar-heading">Overview</div>
       <a href="{{ url_for('faculty.dashboard') }}" class="nav-link sidebar-link {% if request.endpoint == 'faculty.dashboard' %}active{% endif %}">
-        <i class="bi bi-speedometer2"></i>
-        <span>Faculty Dashboard</span>
+        <i class="bi bi-grid-1x2"></i>
+        <span>Dashboard</span>
       </a>
       <a href="{{ url_for('faculty.students') }}" class="nav-link sidebar-link {% if request.endpoint == 'faculty.students' %}active{% endif %}">
         <i class="bi bi-people"></i>
-        <span>Student Roster</span>
+        <span>Students</span>
       </a>
       <a href="{{ url_for('faculty.subjects') }}" class="nav-link sidebar-link {% if request.endpoint == 'faculty.subjects' %}active{% endif %}">
-        <i class="bi bi-journal-bookmark"></i>
-        <span>Courses</span>
+        <i class="bi bi-journal-text"></i>
+        <span>Subjects</span>
       </a>
 
-      <div class="sidebar-heading">Assessments</div>
+      <div class="sidebar-heading">Academic Tasks</div>
       <a href="{{ url_for('faculty.marks') }}" class="nav-link sidebar-link {% if request.endpoint == 'faculty.marks' %}active{% endif %}">
         <i class="bi bi-award"></i>
         <span>Enter Marks</span>
       </a>
       <a href="{{ url_for('faculty.attendance') }}" class="nav-link sidebar-link {% if request.endpoint == 'faculty.attendance' %}active{% endif %}">
         <i class="bi bi-calendar-check"></i>
-        <span>Mark Attendance</span>
+        <span>Attendance</span>
       </a>
 
-      <div class="sidebar-heading">Decision Support</div>
+      <div class="sidebar-heading">Intelligence</div>
       <a href="{{ url_for('faculty.analytics') }}" class="nav-link sidebar-link {% if request.endpoint == 'faculty.analytics' %}active{% endif %}">
-        <i class="bi bi-bar-chart-line"></i>
+        <i class="bi bi-bar-chart"></i>
         <span>Class Analytics</span>
       </a>
       <a href="{{ url_for('faculty.alerts') }}" class="nav-link sidebar-link {% if request.endpoint == 'faculty.alerts' %}active{% endif %}">
@@ -101,21 +101,21 @@
       </a>
       <a href="{{ url_for('faculty.predictions') }}" class="nav-link sidebar-link {% if request.endpoint == 'faculty.predictions' %}active{% endif %}">
         <i class="bi bi-cpu"></i>
-        <span>Grade Predictions</span>
+        <span>Predictions</span>
       </a>
       <a href="{{ url_for('faculty.reports') }}" class="nav-link sidebar-link {% if request.endpoint == 'faculty.reports' %}active{% endif %}">
-        <i class="bi bi-file-earmark-pdf"></i>
-        <span>Download Reports</span>
+        <i class="bi bi-file-earmark-arrow-down"></i>
+        <span>Reports</span>
       </a>
 
     {% elif session.get('role') == 'student' %}
       <div class="sidebar-heading">Student Portal</div>
       <a href="{{ url_for('student.dashboard') }}" class="nav-link sidebar-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
-        <i class="bi bi-speedometer2"></i>
+        <i class="bi bi-grid-1x2"></i>
         <span>Overview</span>
       </a>
       <a href="{{ url_for('student.profile') }}" class="nav-link sidebar-link {% if request.endpoint == 'student.profile' %}active{% endif %}">
-        <i class="bi bi-person-lines-fill"></i>
+        <i class="bi bi-person"></i>
         <span>My Profile</span>
       </a>
       <a href="{{ url_for('student.marks') }}" class="nav-link sidebar-link {% if request.endpoint == 'student.marks' %}active{% endif %}">
@@ -124,15 +124,15 @@
       </a>
       <a href="{{ url_for('student.attendance') }}" class="nav-link sidebar-link {% if request.endpoint == 'student.attendance' %}active{% endif %}">
         <i class="bi bi-calendar-check"></i>
-        <span>My Attendance</span>
+        <span>Attendance</span>
       </a>
       <a href="{{ url_for('student.performance') }}" class="nav-link sidebar-link {% if request.endpoint == 'student.performance' %}active{% endif %}">
         <i class="bi bi-graph-up"></i>
-        <span>Performance Trends</span>
+        <span>Trends</span>
       </a>
       <a href="{{ url_for('student.predictions') }}" class="nav-link sidebar-link {% if request.endpoint == 'student.predictions' %}active{% endif %}">
         <i class="bi bi-cpu"></i>
-        <span>Grade Prediction</span>
+        <span>Grade Forecast</span>
       </a>
     {% endif %}
   </div>
@@ -145,16 +145,16 @@
           {{ (session.get('faculty_name') or session.get('username') or 'U')[0]|upper }}
         </div>
         <div class="text-truncate">
-          <div class="text-white text-truncate fw-semibold" style="font-size: 0.85rem;">
+          <div class="text-white text-truncate fw-semibold" style="font-size: 0.82rem;">
             {{ session.get('faculty_name') or session.get('username') }}
           </div>
-          <div class="text-muted" style="font-size: 0.725rem;">
-            Role: <span class="text-capitalize text-info">{{ session.get('role') }}</span>
+          <div class="text-muted" style="font-size: 0.7rem; text-transform: capitalize;">
+            {{ session.get('role') }}
           </div>
         </div>
       </div>
-      <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Sign Out">
-        <i class="bi bi-box-arrow-right"></i>
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-sm text-secondary p-1" title="Sign Out">
+        <i class="bi bi-box-arrow-right fs-6"></i>
       </a>
     </div>
   </div>

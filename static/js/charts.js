@@ -1,20 +1,11 @@
-// Chart.js helper utilities for Academic Analytics
+// Academic Analytics — Modern Chart.js Design System
+
+// Global Chart.js Defaults
+Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#64748B';
 
 const MITSCharts = {
-    // Colors matching Midnight Navy theme
-    colors: {
-        primaryNavy: '#172554',
-        secondaryBlue: '#2563EB',
-        accentSky: '#38BDF8',
-        successGreen: '#16A34A',
-        warningAmber: '#D97706',
-        dangerRed: '#DC2626',
-        purple: '#8B5CF6',
-        grayGrid: '#E2E8F0',
-        textDark: '#1E293B',
-        textMuted: '#64748B'
-    },
-
     // 1. Grade Distribution Bar Chart
     createGradeDistributionChart: function (canvasId, labels, counts) {
         const ctx = document.getElementById(canvasId);
@@ -25,16 +16,15 @@ const MITSCharts = {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Students Count',
                     data: counts,
                     backgroundColor: [
-                        '#16A34A', // Grade A - Green
-                        '#2563EB', // Grade B - Blue
-                        '#D97706', // Grade C - Amber
-                        '#DC2626'  // Grade F - Red
+                        '#10B981', // Grade A - Emerald
+                        '#2563EB', // Grade B - Royal Blue
+                        '#F59E0B', // Grade C - Amber
+                        '#EF4444'  // Grade F - Soft Red
                     ],
                     borderRadius: 6,
-                    maxBarThickness: 45
+                    maxBarThickness: 42
                 }]
             },
             options: {
@@ -43,9 +33,15 @@ const MITSCharts = {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
+                        backgroundColor: '#0F172A',
+                        titleFont: { weight: '600', size: 12 },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        cornerRadius: 8,
+                        displayColors: false,
                         callbacks: {
-                            label: function (context) {
-                                return ` ${context.raw} records`;
+                            label: function (ctx) {
+                                return `${ctx.raw} student records`;
                             }
                         }
                     }
@@ -53,19 +49,21 @@ const MITSCharts = {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { stepSize: 1, color: '#64748B' },
-                        grid: { color: '#F1F5F9' }
+                        ticks: { stepSize: 2, color: '#94A3B8' },
+                        grid: { color: '#F1F5F9', drawBorder: false },
+                        border: { display: false }
                     },
                     x: {
-                        ticks: { color: '#64748B' },
-                        grid: { display: false }
+                        ticks: { color: '#64748B', font: { weight: '500' } },
+                        grid: { display: false },
+                        border: { display: false }
                     }
                 }
             }
         });
     },
 
-    // 2. Subject Averages Horizontal / Vertical Bar Chart
+    // 2. Subject Averages Bar Chart
     createSubjectAveragesChart: function (canvasId, labels, averages) {
         const ctx = document.getElementById(canvasId);
         if (!ctx) return null;
@@ -75,11 +73,10 @@ const MITSCharts = {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Average Score (%)',
                     data: averages,
                     backgroundColor: '#2563EB',
                     borderRadius: 6,
-                    maxBarThickness: 40
+                    maxBarThickness: 36
                 }]
             },
             options: {
@@ -88,9 +85,13 @@ const MITSCharts = {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
+                        backgroundColor: '#0F172A',
+                        padding: 10,
+                        cornerRadius: 8,
+                        displayColors: false,
                         callbacks: {
-                            label: function (context) {
-                                return ` Average: ${context.raw}%`;
+                            label: function (ctx) {
+                                return `Average: ${ctx.raw}%`;
                             }
                         }
                     }
@@ -100,21 +101,24 @@ const MITSCharts = {
                         beginAtZero: true,
                         max: 100,
                         ticks: {
-                            callback: function (val) { return val + '%'; },
-                            color: '#64748B'
+                            stepSize: 20,
+                            callback: function (v) { return v + '%'; },
+                            color: '#94A3B8'
                         },
-                        grid: { color: '#F1F5F9' }
+                        grid: { color: '#F1F5F9' },
+                        border: { display: false }
                     },
                     x: {
-                        ticks: { color: '#64748B' },
-                        grid: { display: false }
+                        ticks: { color: '#64748B', font: { weight: '500' } },
+                        grid: { display: false },
+                        border: { display: false }
                     }
                 }
             }
         });
     },
 
-    // 3. Pass / Fail Donut Chart
+    // 3. Pass / Fail Clean Donut Chart
     createPassFailChart: function (canvasId, passedCount, failedCount) {
         const ctx = document.getElementById(canvasId);
         if (!ctx) return null;
@@ -125,19 +129,32 @@ const MITSCharts = {
                 labels: ['Passed', 'Failed'],
                 datasets: [{
                     data: [passedCount, failedCount],
-                    backgroundColor: ['#16A34A', '#DC2626'],
-                    borderWidth: 2,
+                    backgroundColor: ['#10B981', '#EF4444'],
+                    borderWidth: 3,
                     borderColor: '#FFFFFF'
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '70%',
+                cutout: '74%',
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { boxWidth: 14, font: { size: 12 }, color: '#1E293B' }
+                        labels: {
+                            boxWidth: 8,
+                            boxHeight: 8,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 14,
+                            font: { size: 12, weight: '500' },
+                            color: '#475569'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#0F172A',
+                        padding: 10,
+                        cornerRadius: 8
                     }
                 }
             }
@@ -149,11 +166,19 @@ const MITSCharts = {
         const ctx = document.getElementById(canvasId);
         if (!ctx) return null;
 
+        // Apply smooth line styles
+        const styledDatasets = datasets.map(d => ({
+            ...d,
+            pointRadius: 3,
+            pointHoverRadius: 6,
+            borderWidth: 2
+        }));
+
         return new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
-                datasets: datasets
+                datasets: styledDatasets
             },
             options: {
                 responsive: true,
@@ -165,7 +190,19 @@ const MITSCharts = {
                 plugins: {
                     legend: {
                         position: 'top',
-                        labels: { boxWidth: 12, color: '#1E293B' }
+                        align: 'end',
+                        labels: {
+                            boxWidth: 8,
+                            boxHeight: 8,
+                            usePointStyle: true,
+                            font: { size: 11, weight: '500' },
+                            color: '#475569'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#0F172A',
+                        padding: 10,
+                        cornerRadius: 8
                     }
                 },
                 scales: {
@@ -173,14 +210,16 @@ const MITSCharts = {
                         beginAtZero: true,
                         max: 100,
                         ticks: {
-                            callback: function (val) { return val + '%'; },
-                            color: '#64748B'
+                            callback: function (v) { return v + '%'; },
+                            color: '#94A3B8'
                         },
-                        grid: { color: '#F1F5F9' }
+                        grid: { color: '#F1F5F9' },
+                        border: { display: false }
                     },
                     x: {
                         ticks: { color: '#64748B' },
-                        grid: { display: false }
+                        grid: { display: false },
+                        border: { display: false }
                     }
                 }
             }

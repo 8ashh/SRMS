@@ -1,30 +1,32 @@
 {% extends 'base.html' %}
 
-{% block page_title %}Academic Reports & Export Center{% endblock %}
+{% block page_title %}Reports{% endblock %}
 {% block page_subtitle %}Generate formal institutional PDF dossiers and raw CSV data sheets{% endblock %}
 
 {% block content %}
 <div class="row g-4">
-  <!-- Report 1: Individual Student Academic Dossier -->
+  <!-- Report 1: Student Dossier -->
   <div class="col-lg-4">
-    <div class="card shadow-sm h-100 border-top border-4 border-primary">
+    <div class="card h-100">
       <div class="card-body p-4 d-flex flex-column justify-content-between">
         <div>
           <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="p-2 bg-light rounded text-primary fs-4"><i class="bi bi-person-lines-fill"></i></div>
-            <h5 class="fw-bold text-dark mb-0">Student Dossier</h5>
+            <div class="avatar-circle">
+              <i class="bi bi-person"></i>
+            </div>
+            <h6 class="fw-bold text-dark mb-0">Student Dossier</h6>
           </div>
           <p class="text-muted small mb-4">
-            Generates a complete individual report including enrolled subjects, test scores, attendance percentage, risk warnings, and grade forecasts.
+            Complete dossier including enrolled subjects, test scores, attendance percentage, warnings, and predictions.
           </p>
 
           <div class="mb-3">
-            <label for="studentSelect" class="form-label fw-semibold text-secondary small">SELECT STUDENT</label>
-            <select class="form-select" id="studentSelect">
+            <label for="studentSelect" class="form-label">Select Student</label>
+            <select class="form-select form-select-sm" id="studentSelect">
               <option value="">Select Enrolled Student</option>
               {% for s in students %}
                 <option value="{{ s.student_id }}">
-                  {{ s.roll_no }} - {{ s.name }} (Sem {{ s.semester }})
+                  {{ s.roll_no }} &mdash; {{ s.name }} (Sem {{ s.semester }})
                 </option>
               {% endfor %}
             </select>
@@ -32,33 +34,35 @@
         </div>
 
         <div class="d-grid gap-2 mt-3">
-          <button type="button" class="btn btn-navy" onclick="downloadStudentReport('pdf')">
-            <i class="bi bi-file-earmark-pdf me-2"></i> Download Official PDF
+          <button type="button" class="btn btn-navy btn-sm" onclick="downloadStudentReport('pdf')">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
           </button>
-          <button type="button" class="btn btn-outline-success btn-sm" onclick="downloadStudentReport('csv')">
-            <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export Data as CSV
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="downloadStudentReport('csv')">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export CSV
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Report 2: Class Performance Report -->
+  <!-- Report 2: Class Performance -->
   <div class="col-lg-4">
-    <div class="card shadow-sm h-100 border-top border-4 border-success">
+    <div class="card h-100">
       <div class="card-body p-4 d-flex flex-column justify-content-between">
         <div>
           <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="p-2 bg-light rounded text-success fs-4"><i class="bi bi-bar-chart-steps"></i></div>
-            <h5 class="fw-bold text-dark mb-0">Class Performance Report</h5>
+            <div class="avatar-circle">
+              <i class="bi bi-bar-chart"></i>
+            </div>
+            <h6 class="fw-bold text-dark mb-0">Class Performance</h6>
           </div>
           <p class="text-muted small mb-4">
-            Aggregated institutional report containing overall class averages, subject-wise performance breakdown, grade distributions, and pass/fail rates.
+            Aggregated institutional report containing overall cohort averages, subject breakdown, and pass/fail statistics.
           </p>
 
           <div class="row g-2 mb-3">
             <div class="col-6">
-              <label for="classSemSelect" class="form-label fw-semibold text-secondary small">SEMESTER</label>
+              <label for="classSemSelect" class="form-label">Semester</label>
               <select class="form-select form-select-sm" id="classSemSelect">
                 <option value="">All Semesters</option>
                 {% for sem in range(1, 9) %}
@@ -67,39 +71,41 @@
               </select>
             </div>
             <div class="col-6">
-              <label for="classSecInput" class="form-label fw-semibold text-secondary small">SECTION</label>
+              <label for="classSecInput" class="form-label">Section</label>
               <input type="text" class="form-control form-control-sm" id="classSecInput" placeholder="All Sections">
             </div>
           </div>
         </div>
 
         <div class="d-grid gap-2 mt-3">
-          <button type="button" class="btn btn-success" onclick="downloadClassReport('pdf')">
-            <i class="bi bi-file-earmark-pdf me-2"></i> Download Class PDF
+          <button type="button" class="btn btn-navy btn-sm" onclick="downloadClassReport('pdf')">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Download Class PDF
           </button>
-          <button type="button" class="btn btn-outline-success btn-sm" onclick="downloadClassReport('csv')">
-            <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export Class CSV
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="downloadClassReport('csv')">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Class CSV
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Report 3: Early Warning & Risk Intervention Report -->
+  <!-- Report 3: Risk Alerts -->
   <div class="col-lg-4">
-    <div class="card shadow-sm h-100 border-top border-4 border-danger">
+    <div class="card h-100">
       <div class="card-body p-4 d-flex flex-column justify-content-between">
         <div>
           <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="p-2 bg-light rounded text-danger fs-4"><i class="bi bi-exclamation-triangle-fill"></i></div>
-            <h5 class="fw-bold text-dark mb-0">Early Warning Risk Roster</h5>
+            <div class="avatar-circle" style="color: var(--status-danger); background-color: var(--status-danger-bg);">
+              <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <h6 class="fw-bold text-dark mb-0">Early Warning Roster</h6>
           </div>
           <p class="text-muted small mb-4">
-            Actionable roster of at-risk students flagged by statistical Z-score or falling test trends for pre-examination intervention and tutoring.
+            Roster of at-risk students flagged for low Z-scores or score drops for faculty intervention and tutoring.
           </p>
 
           <div class="mb-3">
-            <label for="riskFilterSelect" class="form-label fw-semibold text-secondary small">SEVERITY TIER</label>
+            <label for="riskFilterSelect" class="form-label">Severity Filter</label>
             <select class="form-select form-select-sm" id="riskFilterSelect">
               <option value="">All Risk Tiers</option>
               <option value="high risk">High Risk Only</option>
@@ -109,11 +115,11 @@
         </div>
 
         <div class="d-grid gap-2 mt-3">
-          <button type="button" class="btn btn-danger" onclick="downloadRiskReport('pdf')">
-            <i class="bi bi-file-earmark-pdf me-2"></i> Download Risk PDF
+          <button type="button" class="btn btn-navy btn-sm" onclick="downloadRiskReport('pdf')">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Download Risk PDF
           </button>
-          <button type="button" class="btn btn-outline-danger btn-sm" onclick="downloadRiskReport('csv')">
-            <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export Risk CSV
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="downloadRiskReport('csv')">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Risk CSV
           </button>
         </div>
       </div>
@@ -124,28 +130,25 @@
 
 {% block extra_js %}
 <script>
-  function downloadStudentReport(format) {
+  function downloadStudentReport(fmt) {
     const sId = document.getElementById('studentSelect').value;
-    if (!sId) {
-      alert("Please select a student first.");
-      return;
-    }
-    window.location.href = `/reports/student/${sId}/${format}`;
+    if (!sId) { alert("Please select a student."); return; }
+    window.location.href = `/reports/student/${sId}/${fmt}`;
   }
 
-  function downloadClassReport(format) {
+  function downloadClassReport(fmt) {
     const sem = document.getElementById('classSemSelect').value;
     const sec = document.getElementById('classSecInput').value;
-    let url = `/reports/class/${format}?`;
+    let url = `/reports/class/${fmt}?`;
     if (sem) url += `semester=${sem}&`;
     if (sec) url += `section=${encodeURIComponent(sec)}&`;
     window.location.href = url;
   }
 
-  function downloadRiskReport(format) {
-    const risk = document.getElementById('riskFilterSelect').value;
-    let url = `/reports/risk/${format}?`;
-    if (risk) url += `risk_filter=${encodeURIComponent(risk)}&`;
+  function downloadRiskReport(fmt) {
+    const r = document.getElementById('riskFilterSelect').value;
+    let url = `/reports/risk/${fmt}?`;
+    if (r) url += `risk_filter=${encodeURIComponent(r)}&`;
     window.location.href = url;
   }
 </script>
