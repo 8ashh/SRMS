@@ -62,8 +62,23 @@ def create_app(config_class=Config):
 
     return app
 
-if __name__ == '__main__':
-    app = create_app()
+# Module-level app instance for WSGI servers (Gunicorn, Vercel, Render)
+app = create_app()
+
+def init_app_state():
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+            from models import User
+            if User.query.first() is None:
+                from seed_data import seed_database
+                seed_database(reset=False, app=app)
+        except Exception as e:
+            print(f"[App Init Note] {e}")
+
+# Automatically initialize database when not running under pytest
+if not os.environ.get('PYTEST_CURRENT_TEST'):
+    init_app_state()
+
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

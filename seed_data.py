@@ -5,8 +5,9 @@ from extensions import db
 from models import User, Student, Subject, Mark, Attendance, AuditLog
 from services.prediction_service import PredictionService
 
-def seed_database(reset=True):
-    app = create_app()
+def seed_database(reset=True, app=None):
+    if app is None:
+        app = create_app()
     with app.app_context():
         if reset:
             print("[Seed] Resetting database tables...")

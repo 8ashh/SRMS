@@ -3,116 +3,838 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In — Academic Analytics & SRMS | MITS Gwalior</title>
+  <title>SRMS Portal — Madhav Institute of Technology & Science (MITS), Gwalior</title>
   
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
   <style>
+    :root {
+      --bg-dark: #070B14;
+      --bg-darker: #04070D;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-primary: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-subtle: #64748B;
+      --accent-blue: #2563EB;
+      --accent-cyan: #38BDF8;
+      --accent-teal: #34D399;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      background: radial-gradient(circle at 50% 0%, #EFF6FF 0%, #F8FAFC 70%);
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Subtle Grid Background Pattern matching user reference */
+    .grid-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Ambient Center Glow */
+    .ambient-glow {
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      transform: translate(-50%, -20%);
+      width: 800px;
+      height: 520px;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.22) 0%, rgba(56, 189, 248, 0.12) 35%, rgba(7, 11, 20, 0) 70%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(40px);
+    }
+
+    /* Navigation Bar */
+    .portal-nav {
+      position: relative;
+      z-index: 10;
+      padding: 1.25rem 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(7, 11, 20, 0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand-logo-badge {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 1.5rem;
+      color: #FFFFFF;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
     }
-    .auth-card {
-      width: 100%;
-      max-width: 440px;
-      background: #FFFFFF;
-      border: 1px solid #E2E8F0;
-      border-radius: 16px;
-      padding: 2.25rem 2rem;
-      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      color: #FFFFFF;
     }
-    .demo-pill {
-      font-size: 0.78rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 6px;
-      border: 1px solid #E2E8F0;
-      background: #F8FAFC;
-      color: #334155;
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-pill-link {
+      color: #94A3B8;
+      font-size: 0.88rem;
       font-weight: 500;
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .nav-pill-link:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-pill-link.active {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-signin-nav {
+      background: #FFFFFF;
+      color: #0F172A;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 0.45rem 1.15rem;
+      border-radius: 8px;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-signin-nav:hover {
+      background: #F1F5F9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      position: relative;
+      z-index: 2;
+      padding: 4.5rem 1.5rem 3.5rem;
+      text-align: center;
+    }
+
+    .official-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.38rem 0.95rem;
+      background: rgba(37, 99, 235, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: 9999px;
+      color: #93C5FD;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.12);
+    }
+
+    .inst-hindi {
+      font-family: 'Noto Sans Devanagari', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: #CBD5E1;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.25rem;
+    }
+
+    .inst-english {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #64748B;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-size: 3.25rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-title-gradient {
+      background: linear-gradient(135deg, #38BDF8 0%, #34D399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: block;
+    }
+
+    .hero-subtitle {
+      font-size: 1.05rem;
+      color: #94A3B8;
+      line-height: 1.6;
+      max-width: 660px;
+      margin: 0 auto 2.25rem;
+    }
+
+    /* Hero CTA Buttons */
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 4rem;
+    }
+
+    .btn-hero-primary {
+      background: #FFFFFF;
+      color: #0F172A;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: 10px;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-hero-primary:hover {
+      background: #F8FAFC;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.25);
+      color: #0F172A;
+    }
+
+    .btn-hero-secondary {
+      background: rgba(30, 41, 59, 0.65);
+      color: #E2E8F0;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.75rem 1.65rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-hero-secondary:hover {
+      background: rgba(51, 65, 85, 0.8);
+      border-color: rgba(255, 255, 255, 0.24);
+      color: #FFFFFF;
+      transform: translateY(-2px);
+    }
+
+    /* Platform Overview Section matching screenshot */
+    .overview-section {
+      position: relative;
+      z-index: 2;
+      padding: 2.5rem 1.5rem 5rem;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-subtitle {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+    }
+
+    /* Stats Grid */
+    .stat-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 1.75rem 1.25rem;
+      text-align: center;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+      height: 100%;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(56, 189, 248, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-number {
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1;
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #CBD5E1;
+      margin-bottom: 0.2rem;
+    }
+
+    .stat-desc {
+      font-size: 0.74rem;
+      color: #64748B;
+    }
+
+    /* Feature Pillars */
+    .pillar-card {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 1.75rem;
+      text-align: left;
+      height: 100%;
+      transition: all 0.2s ease;
+    }
+
+    .pillar-card:hover {
+      border-color: rgba(37, 99, 235, 0.35);
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    /* Modern Sign-In Modal */
+    .modal-backdrop.show {
+      opacity: 0.82 !important;
+      background-color: #030712 !important;
+      backdrop-filter: blur(8px) !important;
+    }
+
+    .modal-content.dark-auth-modal {
+      background: #0B132B !important;
+      background-color: #0B132B !important;
+      border: 1px solid rgba(255, 255, 255, 0.14) !important;
+      border-radius: 20px !important;
+      box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.9), 0 0 35px rgba(37, 99, 235, 0.25) !important;
+      color: #FFFFFF !important;
+      overflow: hidden;
+      position: relative;
+      z-index: 1060;
+    }
+
+    .modal-header.dark-auth-header {
+      background: #0e1733 !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1.25rem 1.75rem;
+    }
+
+    .auth-alert-box {
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #93C5FD;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .auth-alert-box.alert-danger, .auth-alert-box.alert-error {
+      background: rgba(220, 38, 38, 0.15);
+      border-color: rgba(239, 68, 68, 0.35);
+      color: #FCA5A5;
+    }
+
+    .auth-alert-box.alert-success {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(52, 211, 153, 0.35);
+      color: #6EE7B7;
+    }
+
+    .auth-input-group {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+
+    .auth-input-group:focus-within {
+      border-color: #38BDF8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    .auth-input-group .input-group-text {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      padding-left: 1rem;
+    }
+
+    .auth-input-group .form-control {
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      font-size: 0.92rem;
+      padding: 0.75rem 1rem 0.75rem 0.5rem;
+    }
+
+    .auth-input-group .form-control:focus {
+      background: transparent;
+      box-shadow: none;
+      color: #FFFFFF;
+    }
+
+    .auth-input-group .form-control::placeholder {
+      color: #64748B;
+    }
+
+    .demo-pill-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #CBD5E1;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
     }
-    .demo-pill:hover {
-      background: #EFF6FF;
-      border-color: #BFDBFE;
-      color: #1D4ED8;
+
+    .demo-pill-btn:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #38BDF8;
+      transform: translateY(-1px);
+    }
+
+    .btn-submit-auth {
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 0.92rem;
+      padding: 0.75rem;
+      border-radius: 10px;
+      border: none;
+      width: 100%;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-submit-auth:hover {
+      background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    }
+
+    /* Footer */
+    .portal-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      color: #64748B;
+      font-size: 0.82rem;
+      position: relative;
+      z-index: 2;
+      background: var(--bg-darker);
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.2rem;
+      }
+      .portal-nav {
+        padding: 1rem;
+      }
+      .nav-links-center {
+        display: none !important;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="auth-card">
-    <!-- Header -->
-    <div class="text-center mb-4">
-      <div class="d-inline-flex align-items-center justify-content-center p-2 rounded-3 bg-primary bg-opacity-10 text-primary mb-3">
-        <i class="bi bi-mortarboard-fill fs-4"></i>
+  <!-- Ambient background glow and grid -->
+  <div class="grid-background"></div>
+  <div class="ambient-glow"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="portal-nav">
+    <div class="container-fluid max-w-7xl d-flex align-items-center justify-content-between px-md-4">
+      
+      <!-- Brand / Logo -->
+      <div class="d-flex align-items-center gap-3">
+        <div class="brand-logo-badge">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <div>
+          <div class="brand-title">SRMS</div>
+          <div class="brand-sub">MITS Gwalior</div>
+        </div>
       </div>
-      <h4 class="fw-bold text-dark mb-1" style="letter-spacing: -0.02em;">MITS Gwalior</h4>
-      <p class="text-muted small mb-0">Academic Performance Analytics & SRMS</p>
+
+      <!-- Navigation links (Center) -->
+      <nav class="d-none d-md-flex align-items-center gap-2 nav-links-center">
+        <a href="#hero" class="nav-pill-link active">Home</a>
+        <a href="#overview" class="nav-pill-link">Platform</a>
+        <a href="#features" class="nav-pill-link">Features</a>
+        <a href="#demo" class="nav-pill-link" onclick="openSignInModal()">Demo Accounts</a>
+      </nav>
+
+      <!-- Right actions -->
+      <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-sm text-secondary p-2 d-none d-sm-inline-flex" title="Portal Active" style="background: rgba(255,255,255,0.04); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+          <i class="bi bi-brightness-high text-warning"></i>
+        </button>
+        <button type="button" class="btn-signin-nav" onclick="openSignInModal()">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span>Sign In</span>
+        </button>
+      </div>
+
     </div>
+  </header>
 
-    <!-- Flash messages -->
-    {% include 'components/flash_messages.html' %}
-
-    <!-- Form -->
-    <form action="{{ url_for('auth.login', next=request.args.get('next')) }}" method="POST">
-      <div class="mb-3">
-        <label for="username" class="form-label">Username or Roll Number</label>
-        <div class="input-group">
-          <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-person"></i></span>
-          <input type="text" class="form-control border-start-0 ps-0" id="username" name="username" value="{{ username or '' }}" placeholder="e.g. admin, faculty_sharma, ai23001" required autofocus>
+  <!-- Hero Section -->
+  <main class="hero-section" id="hero">
+    <div class="container">
+      
+      <!-- Official Badge -->
+      <div>
+        <div class="official-badge">
+          <i class="bi bi-lightning-charge-fill text-warning"></i>
+          <span>Official MITS Gwalior Portal</span>
         </div>
       </div>
 
-      <div class="mb-4">
-        <label for="password" class="form-label">Password</label>
-        <div class="input-group">
-          <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-lock"></i></span>
-          <input type="password" class="form-control border-start-0 ps-0" id="password" name="password" placeholder="Enter password" required>
+      <!-- Institutional Subheadings -->
+      <div class="inst-hindi">माधव प्रौद्योगिकी एवं विज्ञान संस्थान, ग्वालियर</div>
+      <div class="inst-english">Madhav Institute of Technology & Science, Gwalior</div>
+
+      <!-- Hero Title -->
+      <h1 class="hero-title">
+        Academic Performance Analytics &
+        <span class="hero-title-gradient">Student Record Management System</span>
+      </h1>
+
+      <!-- Hero Subtitle -->
+      <p class="hero-subtitle">
+        A comprehensive academic decision-support platform for managing student profiles, tracking examination trends, detecting early academic risks, and forecasting final grade outcomes at MITS Gwalior.
+      </p>
+
+      <!-- Hero CTA Buttons -->
+      <div class="hero-actions">
+        <button type="button" class="btn-hero-primary" onclick="openSignInModal()">
+          <span>Get Started</span>
+          <i class="bi bi-arrow-right"></i>
+        </button>
+        <button type="button" class="btn-hero-secondary" onclick="openSignInModal()">
+          <i class="bi bi-shield-lock-fill text-info"></i>
+          <span>Demo Credentials</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Platform Overview Section matching user screenshot -->
+  <section class="overview-section" id="overview">
+    <div class="container">
+      
+      <h2 class="section-title">Platform Overview</h2>
+      <p class="section-subtitle">Real-time statistics showcasing our growing academic community and predictive intelligence</p>
+
+      <!-- 4 Stat Metric Cards -->
+      <div class="row g-4 justify-content-center mb-5">
+        
+        <div class="col-6 col-lg-3">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(37, 99, 235, 0.15); color: #60A5FA;">
+              <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="stat-number">24</div>
+            <div class="stat-label">Students Tracked</div>
+            <div class="stat-desc">Active cohort enrollment</div>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #34D399;">
+              <i class="bi bi-journal-bookmark-fill"></i>
+            </div>
+            <div class="stat-number">5</div>
+            <div class="stat-label">Core Subjects</div>
+            <div class="stat-desc">CSE Department curriculum</div>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24;">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <div class="stat-number">&lt;75%</div>
+            <div class="stat-label">Early Risk Alerts</div>
+            <div class="stat-desc">Z-score &amp; attendance guard</div>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(139, 92, 246, 0.15); color: #A78BFA;">
+              <i class="bi bi-cpu-fill"></i>
+            </div>
+            <div class="stat-number">95%+</div>
+            <div class="stat-label">Predictive R²</div>
+            <div class="stat-desc">Scikit-learn ML model</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Feature Highlights -->
+      <div class="row g-4 text-start mt-2" id="features">
+        <div class="col-md-4">
+          <div class="pillar-card">
+            <div class="d-inline-flex p-2 rounded-3 bg-primary bg-opacity-20 text-info mb-3">
+              <i class="bi bi-bar-chart-line-fill fs-5"></i>
+            </div>
+            <h5 class="fw-bold text-white mb-2" style="font-size: 1.05rem;">Academic Decision Support</h5>
+            <p class="text-secondary small mb-0">Transform raw marks and daily attendance into actionable institutional insights with interactive Chart.js analytics.</p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="pillar-card">
+            <div class="d-inline-flex p-2 rounded-3 bg-warning bg-opacity-20 text-warning mb-3">
+              <i class="bi bi-bell-fill fs-5"></i>
+            </div>
+            <h5 class="fw-bold text-white mb-2" style="font-size: 1.05rem;">Early Anomaly Detection</h5>
+            <p class="text-secondary small mb-0">Dual statistical rules flag students with sharp test drops (&gt;15%) or abnormal low Z-scores before final exams arrive.</p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="pillar-card">
+            <div class="d-inline-flex p-2 rounded-3 bg-success bg-opacity-20 text-success mb-3">
+              <i class="bi bi-graph-up-arrow fs-5"></i>
+            </div>
+            <h5 class="fw-bold text-white mb-2" style="font-size: 1.05rem;">Grade Forecasting (ML)</h5>
+            <p class="text-secondary small mb-0">Linear Regression and Random Forest models correlate midterms with lecture attendance to predict final academic letter grades.</p>
+          </div>
         </div>
       </div>
 
-      <button type="submit" class="btn btn-navy w-100 py-2 fw-semibold mb-3">
-        Sign In
-      </button>
-    </form>
+    </div>
+  </section>
 
-    <!-- Quick Demo Accounts Switcher -->
-    <div class="pt-3 border-top text-center">
-      <div class="text-muted small mb-2" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em;">Demo Accounts</div>
-      <div class="d-flex justify-content-center gap-2">
-        <button type="button" class="demo-pill" onclick="fillCreds('admin', 'admin123')">
-          <i class="bi bi-shield-check me-1 text-primary"></i>Admin
-        </button>
-        <button type="button" class="demo-pill" onclick="fillCreds('faculty_sharma', 'faculty123')">
-          <i class="bi bi-person-badge me-1 text-success"></i>Faculty
-        </button>
-        <button type="button" class="demo-pill" onclick="fillCreds('ai23001', 'AI23001@123')">
-          <i class="bi bi-mortarboard me-1 text-info"></i>Student
-        </button>
+  <!-- Footer -->
+  <footer class="portal-footer">
+    <div class="container">
+      <div class="mb-2 text-light fw-medium">Madhav Institute of Technology &amp; Science (MITS), Gwalior</div>
+      <div class="text-secondary mb-1">Department of Computer Science &amp; Engineering &bull; Academic Year 2025–2026</div>
+      <div class="text-muted" style="font-size: 0.74rem;">Academic Performance Analytics &amp; Student Record Management System &bull; Beginner-Friendly Micro-Project</div>
+    </div>
+  </footer>
+
+  <!-- Sign In Modal -->
+  <div class="modal fade" id="signInModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+      <div class="modal-content dark-auth-modal">
+        
+        <!-- Modal Header -->
+        <div class="modal-header dark-auth-header d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-2">
+            <div class="brand-logo-badge" style="width: 32px; height: 32px; font-size: 1rem;">
+              <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div>
+              <h5 class="modal-title fw-bold text-white mb-0" id="signInModalLabel" style="font-size: 1.05rem;">Portal Sign In</h5>
+              <div class="text-secondary" style="font-size: 0.72rem;">MITS Gwalior SRMS</div>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body p-4">
+          
+          <!-- Flash Messages inside modal -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="mb-3">
+                {% for category, message in messages %}
+                  <div class="auth-alert-box alert-{{ 'danger' if category == 'danger' or category == 'error' else category }} d-flex align-items-center gap-2" role="alert">
+                    <i class="bi {{ 'bi-check-circle-fill' if category == 'success' else 'bi-exclamation-circle-fill' }}"></i>
+                    <div>{{ message }}</div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+          <!-- Form -->
+          <form action="{{ url_for('auth.login', next=request.args.get('next')) }}" method="POST" id="loginForm">
+            
+            <div class="mb-3">
+              <label for="modalUsername" class="form-label text-secondary small fw-medium mb-1">Username or Roll Number</label>
+              <div class="input-group auth-input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" id="modalUsername" name="username" value="{{ username or '' }}" placeholder="admin, faculty_sharma, ai23001" required autofocus>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="modalPassword" class="form-label text-secondary small fw-medium mb-1">Password</label>
+              <div class="input-group auth-input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input type="password" class="form-control" id="modalPassword" name="password" placeholder="Enter password" required>
+                <button type="button" class="btn btn-link text-secondary text-decoration-none pe-3" onclick="togglePasswordVisibility()">
+                  <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-submit-auth mb-3">
+              <span>Sign In to Dashboard</span>
+              <i class="bi bi-box-arrow-in-right ms-1"></i>
+            </button>
+
+          </form>
+
+          <!-- 1-Click Demo Accounts -->
+          <div class="pt-3 border-top border-secondary border-opacity-25 text-center" id="demo">
+            <div class="text-secondary small mb-2" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">
+              1-Click Demo Logins
+            </div>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+              <button type="button" class="demo-pill-btn" onclick="fillAndSubmit('admin', 'admin123')">
+                <i class="bi bi-shield-check text-primary"></i>Admin
+              </button>
+              <button type="button" class="demo-pill-btn" onclick="fillAndSubmit('faculty_sharma', 'faculty123')">
+                <i class="bi bi-person-badge text-success"></i>Faculty
+              </button>
+              <button type="button" class="demo-pill-btn" onclick="fillAndSubmit('ai23001', 'AI23001@123')">
+                <i class="bi bi-mortarboard text-info"></i>Student
+              </button>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div>
   </div>
 
-  <div class="text-center mt-3 text-muted small" style="font-size: 0.76rem;">
-    Department of Computer Science & Engineering &bull; MITS Gwalior
-  </div>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    function fillCreds(u, p) {
-      document.getElementById('username').value = u;
-      document.getElementById('password').value = p;
+    let authModal = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const modalEl = document.getElementById('signInModal');
+      authModal = new bootstrap.Modal(modalEl);
+
+      // Automatically open modal if there are flash messages or signin query param or next parameter
+      const hasFlashed = {{ 'true' if get_flashed_messages() else 'false' }};
+      const urlParams = new URLSearchParams(window.location.search);
+      if (hasFlashed || urlParams.has('signin') || urlParams.has('next')) {
+        authModal.show();
+      }
+    });
+
+    function openSignInModal() {
+      if (authModal) {
+        authModal.show();
+      }
+    }
+
+    function fillAndSubmit(u, p) {
+      document.getElementById('modalUsername').value = u;
+      document.getElementById('modalPassword').value = p;
+      // Auto-submit for effortless demo experience
+      document.getElementById('loginForm').submit();
+    }
+
+    function togglePasswordVisibility() {
+      const pwd = document.getElementById('modalPassword');
+      const icon = document.getElementById('togglePasswordIcon');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+      } else {
+        pwd.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+      }
     }
   </script>
+
 </body>
 </html>

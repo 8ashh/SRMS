@@ -11,8 +11,13 @@ from extensions import db
 from models import Student, Mark, Attendance
 from services.attendance_service import AttendanceService
 
-MODEL_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'instance', 'ml_models')
-os.makedirs(MODEL_DIR, exist_ok=True)
+from config import INSTANCE_DIR
+
+MODEL_DIR = os.path.join(INSTANCE_DIR, 'ml_models')
+try:
+    os.makedirs(MODEL_DIR, exist_ok=True)
+except Exception:
+    pass
 MODEL_FILE = os.path.join(MODEL_DIR, 'grade_predictor.joblib')
 
 class PredictionService:
