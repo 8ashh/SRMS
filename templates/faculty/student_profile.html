@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Student Dossier: {{ student.name }}{% endblock %}
+{% block page_subtitle %}Roll Number: {{ student.roll_no }} &bull; Semester {{ student.semester }} ({{ student.section }}){% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <a href="{{ url_for('faculty.students') }}" class="btn btn-sm btn-outline-secondary mb-2">
+      <i class="bi bi-arrow-left me-1"></i> Back to Roster
+    </a>
+    <h3 class="fw-bold text-dark mb-0">{{ student.name }}</h3>
+    <p class="text-muted small mb-0">MITS Gwalior Student Performance Record</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('reports.student_pdf', student_id=student.student_id) }}" class="btn btn-danger btn-sm">
+      <i class="bi bi-file-earmark-pdf me-1"></i> PDF Dossier
+    </a>
+    <a href="{{ url_for('reports.student_csv', student_id=student.student_id) }}" class="btn btn-outline-success btn-sm">
+      <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export CSV
+    </a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card kpi-card kpi-primary h-100">
+      <div class="kpi-value">{{ analytics.avg_percentage }}%</div>
+      <div class="kpi-label">Average Score</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card kpi-card kpi-{{ att_info.badge_class }} h-100">
+      <div class="kpi-value">{{ att_info.percentage }}%</div>
+      <div class="kpi-label">Attendance</div>
+      <small class="text-muted">{{ att_info.present }}/{{ att_info.total }} Classes</small>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card kpi-card kpi-primary h-100">
+      <div class="kpi-value">
+        {% if prediction.status == 'success' %}Grade {{ prediction.predicted_grade }}{% else %}N/A{% endif %}
+      </div>
+      <div class="kpi-label">Predicted Grade</div>
+      <small class="text-muted">{% if prediction.status == 'success' %}{{ prediction.predicted_score }}%{% else %}Unavailable{% endif %}</small>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card kpi-card {% if alerts %}kpi-danger{% else %}kpi-success{% endif %} h-100">
+      <div class="kpi-value">{{ alerts|length }}</div>
+      <div class="kpi-label">Risk Flags</div>
+    </div>
+  </div>
+</div>
+
+{% if alerts %}
+  <div class="alert alert-danger shadow-sm border-danger border-opacity-25 mb-4">
+    <h6 class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Active Diagnostic Flags:</h6>
+    <ul class="mb-0 ps-3 small">
+      {% for alert in alerts %}
+        <li><strong>[{{ alert.risk_level }} - {{ alert.subject_code }}]:</strong> {{ alert.reason }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<!-- Marks Table -->
+<div class="card shadow-sm mb-4">
+  <div class="card-header bg-white">
+    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-award me-2 text-primary"></i>Assessment Scores</h5>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Course Code</th>
+          <th>Subject Name</th>
+          <th>Test</th>
+          <th>Score</th>
+          <th>Maximum</th>
+          <th>Percentage</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in marks %}
+          <tr>
+            <td><strong>{{ m.subject.code }}</strong></td>
+            <td>{{ m.subject.name }}</td>
+            <td>Test {{ m.test_no }}</td>
+            <td><strong>{{ m.score }}</strong></td>
+            <td>{{ m.max_score }}</td>
+            <td><span class="badge {% if m.percentage >= 75 %}badge-soft-success{% elif m.percentage >= PASSING_PERCENTAGE %}badge-soft-primary{% else %}badge-soft-danger{% endif %}">{{ m.percentage }}%</span></td>
+            <td>
+              {% if m.percentage >= PASSING_PERCENTAGE %}
+                <span class="text-success small fw-semibold">Pass</span>
+              {% else %}
+                <span class="text-danger small fw-semibold">Fail</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="7" class="text-center py-3 text-muted">No marks recorded.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

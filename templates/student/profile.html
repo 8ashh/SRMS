@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block page_title %}My Profile{% endblock %}
+{% block page_subtitle %}Personal enrollment details and academic registration{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-person-badge text-primary me-2"></i>Academic Profile Details</h5>
+        <span class="badge bg-light text-dark border">Verified Student Record</span>
+      </div>
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+          <div class="avatar-circle" style="width: 56px; height: 56px; font-size: 1.4rem;">
+            {{ student.name[0]|upper }}
+          </div>
+          <div>
+            <h4 class="fw-bold text-dark mb-0">{{ student.name }}</h4>
+            <p class="text-muted small mb-0">Roll Number: <code>{{ student.roll_no }}</code> &bull; MITS Gwalior</p>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="small text-secondary fw-semibold">CURRENT SEMESTER</label>
+            <div class="fs-6 fw-bold text-dark">Semester {{ student.semester }}</div>
+          </div>
+          <div class="col-md-6">
+            <label class="small text-secondary fw-semibold">SECTION</label>
+            <div class="fs-6 fw-bold text-dark">Section {{ student.section }}</div>
+          </div>
+          <div class="col-md-6">
+            <label class="small text-secondary fw-semibold">ATTENDANCE SUMMARY</label>
+            <div>
+              <span class="badge badge-soft-{{ att_info.badge_class }} fs-6">{{ att_info.percentage }}%</span>
+              <small class="text-muted">({{ att_info.present }}/{{ att_info.total }} classes)</small>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="small text-secondary fw-semibold">ENROLLED SINCE</label>
+            <div class="text-dark">{{ student.created_at.strftime('%d-%B-%Y') if student.created_at else 'N/A' }}</div>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Return to Dashboard
+          </a>
+          <a href="{{ url_for('reports.student_pdf', student_id=student.student_id) }}" class="btn btn-navy">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Download Academic Dossier (PDF)
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

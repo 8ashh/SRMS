@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Academic Courses & Syllabus{% endblock %}
+{% block page_subtitle %}Curriculum subjects for student evaluation{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-header bg-white py-3">
+    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-journal-bookmark text-primary me-2"></i>Active Curriculum Courses</h5>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Course Code</th>
+          <th>Subject Title</th>
+          <th>Created Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in subjects %}
+          <tr>
+            <td><strong class="text-primary">{{ s.code }}</strong></td>
+            <td>{{ s.name }}</td>
+            <td><small class="text-muted">{{ s.created_at.strftime('%d-%b-%Y') if s.created_at else 'N/A' }}</small></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="3" class="text-center py-4 text-muted">No subjects configured.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

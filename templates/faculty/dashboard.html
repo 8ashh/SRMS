@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Faculty Assessment & Monitoring Dashboard{% endblock %}
+{% block page_subtitle %}Instructor portal for continuous evaluation, classroom attendance & student monitoring{% endblock %}
+
+{% block content %}
+<!-- Quick Actions Bar -->
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+  <div>
+    <h4 class="fw-bold text-dark mb-1">Welcome, {{ session.get('faculty_name') }}!</h4>
+    <p class="text-muted small mb-0">Department of Computer Science & Engineering &bull; MITS Gwalior</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{{ url_for('faculty.marks') }}" class="btn btn-sm btn-navy">
+      <i class="bi bi-pencil-square me-1"></i> Enter Marks
+    </a>
+    <a href="{{ url_for('faculty.attendance') }}" class="btn btn-sm btn-primary">
+      <i class="bi bi-calendar-check me-1"></i> Mark Attendance
+    </a>
+    <a href="{{ url_for('faculty.students') }}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-people me-1"></i> Student Roster
+    </a>
+    <a href="{{ url_for('faculty.alerts') }}" class="btn btn-sm btn-outline-danger">
+      <i class="bi bi-exclamation-triangle me-1"></i> Risk Alerts
+    </a>
+  </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="card kpi-card kpi-primary h-100">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="kpi-value">{{ summary.total_students }}</div>
+          <div class="kpi-label">Enrolled Students</div>
+        </div>
+        <div class="kpi-icon bg-blue"><i class="bi bi-people-fill"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="card kpi-card kpi-primary h-100">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="kpi-value">{{ summary.total_marks_records }}</div>
+          <div class="kpi-label">Marks Entered</div>
+        </div>
+        <div class="kpi-icon bg-blue"><i class="bi bi-card-checklist"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="card kpi-card kpi-primary h-100">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="kpi-value">{{ summary.overall_avg_percentage }}%</div>
+          <div class="kpi-label">Cohort Average</div>
+        </div>
+        <div class="kpi-icon bg-blue"><i class="bi bi-graph-up"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="card kpi-card {% if high_risk_count > 0 %}kpi-danger{% else %}kpi-success{% endif %} h-100">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="kpi-value">{{ total_risk_count }}</div>
+          <div class="kpi-label">Attention Needed</div>
+        </div>
+        <div class="kpi-icon {% if high_risk_count > 0 %}bg-red{% else %}bg-green{% endif %}">
+          <i class="bi bi-exclamation-octagon-fill"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Grid -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header bg-white">
+        <h6 class="fw-bold text-dark mb-0"><i class="bi bi-bar-chart me-2 text-primary"></i>Grade Tier Distribution</h6>
+      </div>
+      <div class="card-body">
+        <div style="height: 250px;">
+          <canvas id="facultyGradeChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header bg-white">
+        <h6 class="fw-bold text-dark mb-0"><i class="bi bi-diagram-3 me-2 text-primary"></i>Subject Averages (%)</h6>
+      </div>
+      <div class="card-body">
+        <div style="height: 250px;">
+          <canvas id="facultySubjectChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Early Warning Notices -->
+<div class="card shadow-sm border-danger border-opacity-25 mb-4">
+  <div class="card-header bg-danger bg-opacity-10 d-flex align-items-center justify-content-between py-3">
+    <h6 class="fw-bold text-danger mb-0">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>Students Identified for Early Support
+    </h6>
+    <a href="{{ url_for('faculty.alerts') }}" class="btn btn-sm btn-outline-danger">View Full Risk Alerts</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Roll No</th>
+          <th>Student Name</th>
+          <th>Subject</th>
+          <th>Test Score</th>
+          <th>Z-Score</th>
+          <th>Risk Tier</th>
+          <th>Warning Reason</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if top_alerts %}
+          {% for a in top_alerts %}
+            <tr>
+              <td><span class="fw-bold text-primary">{{ a.roll_no }}</span></td>
+              <td>{{ a.student_name }}</td>
+              <td>{{ a.subject_code }}</td>
+              <td>{{ a.current_score }}</td>
+              <td><code>{{ a.z_score }}</code></td>
+              <td><span class="badge badge-soft-{{ a.badge_color }}">{{ a.risk_level }}</span></td>
+              <td><small class="text-muted">{{ a.reason }}</small></td>
+              <td class="text-end">
+                <a href="{{ url_for('faculty.student_profile', student_id=a.student_id) }}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="8" class="text-center py-3 text-muted">No students currently flagged in risk categories.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const gradeLabels = {{ grade_dist.labels|tojson }};
+    const gradeCounts = {{ grade_dist.counts|tojson }};
+    MITSCharts.createGradeDistributionChart('facultyGradeChart', gradeLabels, gradeCounts);
+
+    const subjLabels = {{ subject_avg.labels|tojson }};
+    const subjAverages = {{ subject_avg.averages|tojson }};
+    MITSCharts.createSubjectAveragesChart('facultySubjectChart', subjLabels, subjAverages);
+  });
+</script>
+{% endblock %}

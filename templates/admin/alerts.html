@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Academic Early Warning & Anomaly Alerts{% endblock %}
+{% block page_subtitle %}Automated statistical detection of declining marks and low attendance{% endblock %}
+
+{% block content %}
+<!-- Info Alert Box -->
+<div class="alert alert-info border-info border-opacity-25 shadow-sm mb-4">
+  <div class="d-flex align-items-center gap-2 mb-1">
+    <i class="bi bi-info-circle-fill fs-5 text-primary"></i>
+    <h6 class="fw-bold mb-0 text-primary">Early Academic Intervention Mandate</h6>
+  </div>
+  <p class="mb-0 small text-dark">
+    This module implements statistical monitoring using two distinct methods: 
+    <strong>Method A: Z-score Anomaly Detection</strong> (flagging when $Z < -1.5$ against cohort peers) and 
+    <strong>Method B: Falling Performance Trend</strong> (flagging drops of $\ge 15\%$ between sequential tests). 
+    Alerts serve as supportive academic diagnostics to guide counseling prior to semester finals.
+  </p>
+</div>
+
+<!-- Filter Controls -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-body p-3">
+    <form method="GET" action="{{ url_for('admin.alerts') }}" class="row g-2 align-items-center">
+      <div class="col-md-3">
+        <select class="form-select form-select-sm" name="semester">
+          <option value="">All Semesters</option>
+          {% for sem in range(1, 9) %}
+            <option value="{{ sem }}" {% if selected_sem == sem|string %}selected{% endif %}>Semester {{ sem }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <select class="form-select form-select-sm" name="subject_id">
+          <option value="">All Courses</option>
+          {% for sub in subjects %}
+            <option value="{{ sub.subject_id }}" {% if selected_subj == sub.subject_id %}selected{% endif %}>
+              {{ sub.code }} - {{ sub.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select class="form-select form-select-sm" name="risk_filter">
+          <option value="">All Risk Tiers</option>
+          <option value="high risk" {% if selected_risk == 'high risk' %}selected{% endif %}>High Risk</option>
+          <option value="medium risk" {% if selected_risk == 'medium risk' %}selected{% endif %}>Medium Risk</option>
+          <option value="low risk" {% if selected_risk == 'low risk' %}selected{% endif %}>Low Risk</option>
+        </select>
+      </div>
+      <div class="col-md-2 d-flex gap-1">
+        <button type="submit" class="btn btn-sm btn-navy flex-grow-1"><i class="bi bi-funnel"></i> Filter</button>
+        <a href="{{ url_for('admin.alerts') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Alerts Table -->
+<div class="card shadow-sm mb-4">
+  <div class="card-header bg-white d-flex align-items-center justify-content-between py-3">
+    <h5 class="fw-bold text-dark mb-0">
+      <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Active Academic Risk Roster
+    </h5>
+    <span class="badge bg-light text-dark border">{{ alerts|length }} Issues Identified</span>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Roll No</th>
+          <th>Student Name</th>
+          <th>Course & Test</th>
+          <th>Current Score</th>
+          <th>Previous Score</th>
+          <th>Z-Score</th>
+          <th>Attendance</th>
+          <th>Risk Tier</th>
+          <th>Diagnostic Alert Reason</th>
+          <th class="text-end">Dossier</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if alerts %}
+          {% for a in alerts %}
+            <tr>
+              <td>
+                <a href="{{ url_for('admin.student_profile', student_id=a.student_id) }}" class="fw-bold text-primary text-decoration-none">
+                  {{ a.roll_no }}
+                </a>
+              </td>
+              <td><strong>{{ a.student_name }}</strong></td>
+              <td><span class="badge bg-light text-dark border">{{ a.subject_code }} (T{{ a.test_no }})</span></td>
+              <td><span class="fw-semibold">{{ a.current_score }}</span></td>
+              <td><small class="text-muted">{{ a.previous_score }}</small></td>
+              <td><code>{{ a.z_score }}</code></td>
+              <td>
+                <span class="badge badge-soft-primary">{{ a.attendance_pct }}</span>
+              </td>
+              <td>
+                <span class="badge badge-soft-{{ a.badge_color }} text-nowrap">
+                  {{ a.risk_level }}
+                </span>
+              </td>
+              <td style="max-width: 280px;">
+                <small class="text-dark">{{ a.reason }}</small>
+              </td>
+              <td class="text-end">
+                <a href="{{ url_for('admin.student_profile', student_id=a.student_id) }}" class="btn btn-sm btn-outline-primary" title="Inspect Full Dossier">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="10" class="text-center py-5 text-muted">
+              <i class="bi bi-check-circle-fill text-success fs-1 d-block mb-2"></i>
+              No students currently meet the anomaly thresholds in the selected cohort.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

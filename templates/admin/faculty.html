@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Faculty Account Management{% endblock %}
+{% block page_subtitle %}Provision and supervise instructor credentials and access rights{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Left: Create Faculty Form -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white py-3">
+        <h5 class="fw-bold text-dark mb-0">
+          <i class="bi bi-person-plus text-primary me-2"></i>Add Faculty Account
+        </h5>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('admin.faculty') }}">
+          <div class="mb-3">
+            <label for="faculty_name" class="form-label fw-semibold text-secondary small">FACULTY DISPLAY NAME <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="faculty_name" name="faculty_name" placeholder="e.g. Dr. Rajesh Sharma" required>
+          </div>
+          <div class="mb-3">
+            <label for="username" class="form-label fw-semibold text-secondary small">LOGIN USERNAME <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="e.g. faculty_sharma" required>
+            <div class="form-text">Unique username for signing in.</div>
+          </div>
+          <div class="mb-4">
+            <label for="password" class="form-label fw-semibold text-secondary small">TEMPORARY PASSWORD <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Enter secure password" required minlength="6">
+            <div class="form-text">Securely hashed using Werkzeug PBKDF2.</div>
+          </div>
+          <button type="submit" class="btn btn-navy w-100">
+            <i class="bi bi-check-circle me-1"></i> Create Faculty Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Faculty Members List -->
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex align-items-center justify-content-between py-3">
+        <h5 class="fw-bold text-dark mb-0">
+          <i class="bi bi-people text-primary me-2"></i>Registered Faculty Instructors
+        </h5>
+        <span class="badge bg-light text-dark border">{{ faculty_list|length }} Faculty Users</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-custom table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Faculty Name</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Registered Date</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in faculty_list %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="avatar-circle" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                      {{ (f.faculty_name or f.username)[0]|upper }}
+                    </div>
+                    <strong>{{ f.faculty_name }}</strong>
+                  </div>
+                </td>
+                <td><code>{{ f.username }}</code></td>
+                <td><span class="badge badge-soft-primary text-uppercase">{{ f.role }}</span></td>
+                <td><small class="text-muted">{{ f.created_at.strftime('%d-%b-%Y') if f.created_at else 'N/A' }}</small></td>
+                <td class="text-end">
+                  <form action="{{ url_for('admin.delete_faculty', user_id=f.user_id) }}" method="POST" class="d-inline" onsubmit="return confirmDelete('Are you sure you want to remove faculty account {{ f.faculty_name }}?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove Faculty">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="5" class="text-center py-4 text-muted">No faculty accounts created yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

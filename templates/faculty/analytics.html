@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Faculty Class Analytics{% endblock %}
+{% block page_subtitle %}Evaluate cohort performance metrics and subject outcomes{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card kpi-card kpi-primary h-100">
+      <div class="kpi-value">{{ summary.total_students }}</div>
+      <div class="kpi-label">Students</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card kpi-card kpi-primary h-100">
+      <div class="kpi-value">{{ summary.overall_avg_percentage }}%</div>
+      <div class="kpi-label">Class Average</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card kpi-card kpi-success h-100">
+      <div class="kpi-value">{{ summary.overall_pass_rate }}%</div>
+      <div class="kpi-label">Pass Percentage</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card kpi-card kpi-primary h-100">
+      <div class="kpi-value">{{ summary.avg_attendance }}%</div>
+      <div class="kpi-label">Avg Attendance</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header bg-white"><h6 class="fw-bold mb-0">Grade Distribution</h6></div>
+      <div class="card-body"><div style="height: 250px;"><canvas id="facAnalyticGrade"></canvas></div></div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header bg-white"><h6 class="fw-bold mb-0">Subject Averages (%)</h6></div>
+      <div class="card-body"><div style="height: 250px;"><canvas id="facAnalyticSubject"></canvas></div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const gradeLabels = {{ grade_dist.labels|tojson }};
+    const gradeCounts = {{ grade_dist.counts|tojson }};
+    MITSCharts.createGradeDistributionChart('facAnalyticGrade', gradeLabels, gradeCounts);
+
+    const subjLabels = {{ subject_avg.labels|tojson }};
+    const subjAverages = {{ subject_avg.averages|tojson }};
+    MITSCharts.createSubjectAveragesChart('facAnalyticSubject', subjLabels, subjAverages);
+  });
+</script>
+{% endblock %}

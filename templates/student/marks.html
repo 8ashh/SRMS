@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block page_title %}My Assessment Marks{% endblock %}
+{% block page_subtitle %}Comprehensive ledger of continuous assessments & test scores{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm mb-4">
+  <div class="card-header bg-white d-flex align-items-center justify-content-between py-3">
+    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-award me-2 text-primary"></i>Assessment Ledger</h5>
+    <span class="badge bg-light text-dark border">Average: {{ analytics.avg_percentage }}%</span>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Subject Code</th>
+          <th>Subject Name</th>
+          <th>Test</th>
+          <th>Score</th>
+          <th>Max Score</th>
+          <th>Percentage</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in marks %}
+          <tr>
+            <td><strong>{{ m.subject.code }}</strong></td>
+            <td>{{ m.subject.name }}</td>
+            <td>Test {{ m.test_no }}</td>
+            <td><strong>{{ m.score }}</strong></td>
+            <td>{{ m.max_score }}</td>
+            <td><span class="badge {% if m.percentage >= 75 %}badge-soft-success{% elif m.percentage >= PASSING_PERCENTAGE %}badge-soft-primary{% else %}badge-soft-danger{% endif %}">{{ m.percentage }}%</span></td>
+            <td>
+              {% if m.percentage >= PASSING_PERCENTAGE %}
+                <span class="badge badge-soft-success">Pass</span>
+              {% else %}
+                <span class="badge badge-soft-danger">Fail</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="7" class="text-center py-4 text-muted">No marks recorded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

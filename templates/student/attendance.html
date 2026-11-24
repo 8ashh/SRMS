@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block page_title %}My Classroom Attendance{% endblock %}
+{% block page_subtitle %}Daily subject attendance logs & eligibility status{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card kpi-card kpi-{{ att_info.badge_class }} h-100">
+      <div class="kpi-value">{{ att_info.percentage }}%</div>
+      <div class="kpi-label">Cumulative Attendance</div>
+      <small class="text-muted">Threshold Requirement: &ge; 75%</small>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card kpi-card kpi-success h-100">
+      <div class="kpi-value">{{ att_info.present }}</div>
+      <div class="kpi-label">Classes Attended</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card kpi-card {% if att_info.absent > 5 %}kpi-danger{% else %}kpi-primary{% endif %} h-100">
+      <div class="kpi-value">{{ att_info.absent }}</div>
+      <div class="kpi-label">Classes Absent</div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header bg-white py-3">
+    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-calendar-check me-2 text-primary"></i>Daily Attendance Records</h5>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Subject Code</th>
+          <th>Subject Title</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for att in records %}
+          <tr>
+            <td><small>{{ att.date.strftime('%d-%b-%Y') }}</small></td>
+            <td><strong>{{ att.subject.code }}</strong></td>
+            <td>{{ att.subject.name }}</td>
+            <td>
+              <span class="badge {% if att.status == 'Present' %}badge-soft-success{% else %}badge-soft-danger{% endif %}">{{ att.status }}</span>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4" class="text-center py-4 text-muted">No attendance entries recorded.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

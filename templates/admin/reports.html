@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Academic Reports & Export Center{% endblock %}
+{% block page_subtitle %}Generate formal institutional PDF dossiers and raw CSV data sheets{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Report 1: Individual Student Academic Dossier -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100 border-top border-4 border-primary">
+      <div class="card-body p-4 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="p-2 bg-light rounded text-primary fs-4"><i class="bi bi-person-lines-fill"></i></div>
+            <h5 class="fw-bold text-dark mb-0">Student Dossier</h5>
+          </div>
+          <p class="text-muted small mb-4">
+            Generates a complete individual report including enrolled subjects, test scores, attendance percentage, risk warnings, and grade forecasts.
+          </p>
+
+          <div class="mb-3">
+            <label for="studentSelect" class="form-label fw-semibold text-secondary small">SELECT STUDENT</label>
+            <select class="form-select" id="studentSelect">
+              <option value="">Select Enrolled Student</option>
+              {% for s in students %}
+                <option value="{{ s.student_id }}">
+                  {{ s.roll_no }} - {{ s.name }} (Sem {{ s.semester }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2 mt-3">
+          <button type="button" class="btn btn-navy" onclick="downloadStudentReport('pdf')">
+            <i class="bi bi-file-earmark-pdf me-2"></i> Download Official PDF
+          </button>
+          <button type="button" class="btn btn-outline-success btn-sm" onclick="downloadStudentReport('csv')">
+            <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export Data as CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report 2: Class Performance Report -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100 border-top border-4 border-success">
+      <div class="card-body p-4 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="p-2 bg-light rounded text-success fs-4"><i class="bi bi-bar-chart-steps"></i></div>
+            <h5 class="fw-bold text-dark mb-0">Class Performance Report</h5>
+          </div>
+          <p class="text-muted small mb-4">
+            Aggregated institutional report containing overall class averages, subject-wise performance breakdown, grade distributions, and pass/fail rates.
+          </p>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label for="classSemSelect" class="form-label fw-semibold text-secondary small">SEMESTER</label>
+              <select class="form-select form-select-sm" id="classSemSelect">
+                <option value="">All Semesters</option>
+                {% for sem in range(1, 9) %}
+                  <option value="{{ sem }}">Semester {{ sem }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6">
+              <label for="classSecInput" class="form-label fw-semibold text-secondary small">SECTION</label>
+              <input type="text" class="form-control form-control-sm" id="classSecInput" placeholder="All Sections">
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2 mt-3">
+          <button type="button" class="btn btn-success" onclick="downloadClassReport('pdf')">
+            <i class="bi bi-file-earmark-pdf me-2"></i> Download Class PDF
+          </button>
+          <button type="button" class="btn btn-outline-success btn-sm" onclick="downloadClassReport('csv')">
+            <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export Class CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report 3: Early Warning & Risk Intervention Report -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100 border-top border-4 border-danger">
+      <div class="card-body p-4 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="p-2 bg-light rounded text-danger fs-4"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            <h5 class="fw-bold text-dark mb-0">Early Warning Risk Roster</h5>
+          </div>
+          <p class="text-muted small mb-4">
+            Actionable roster of at-risk students flagged by statistical Z-score or falling test trends for pre-examination intervention and tutoring.
+          </p>
+
+          <div class="mb-3">
+            <label for="riskFilterSelect" class="form-label fw-semibold text-secondary small">SEVERITY TIER</label>
+            <select class="form-select form-select-sm" id="riskFilterSelect">
+              <option value="">All Risk Tiers</option>
+              <option value="high risk">High Risk Only</option>
+              <option value="medium risk">Medium Risk Only</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2 mt-3">
+          <button type="button" class="btn btn-danger" onclick="downloadRiskReport('pdf')">
+            <i class="bi bi-file-earmark-pdf me-2"></i> Download Risk PDF
+          </button>
+          <button type="button" class="btn btn-outline-danger btn-sm" onclick="downloadRiskReport('csv')">
+            <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export Risk CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function downloadStudentReport(format) {
+    const sId = document.getElementById('studentSelect').value;
+    if (!sId) {
+      alert("Please select a student first.");
+      return;
+    }
+    window.location.href = `/reports/student/${sId}/${format}`;
+  }
+
+  function downloadClassReport(format) {
+    const sem = document.getElementById('classSemSelect').value;
+    const sec = document.getElementById('classSecInput').value;
+    let url = `/reports/class/${format}?`;
+    if (sem) url += `semester=${sem}&`;
+    if (sec) url += `section=${encodeURIComponent(sec)}&`;
+    window.location.href = url;
+  }
+
+  function downloadRiskReport(format) {
+    const risk = document.getElementById('riskFilterSelect').value;
+    let url = `/reports/risk/${format}?`;
+    if (risk) url += `risk_filter=${encodeURIComponent(risk)}&`;
+    window.location.href = url;
+  }
+</script>
+{% endblock %}

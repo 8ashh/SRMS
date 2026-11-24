@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block page_title %}My Performance Analytics{% endblock %}
+{% block page_subtitle %}Visual trends across continuous assessments & subject breakdown{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white"><h6 class="fw-bold mb-0">Sequential Test Trajectory</h6></div>
+      <div class="card-body">
+        <div style="height: 250px;"><canvas id="studentPerfTrend"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white"><h6 class="fw-bold mb-0">Subject-wise Average (%)</h6></div>
+      <div class="card-body">
+        <div style="height: 250px;"><canvas id="studentPerfSubject"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header bg-white"><h5 class="fw-bold mb-0">Subject Competency Synthesis</h5></div>
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr><th>Course Code</th><th>Subject Name</th><th>Tests Completed</th><th>Average %</th></tr>
+      </thead>
+      <tbody>
+        {% for s in analytics.subject_performance %}
+          <tr>
+            <td><strong>{{ s.subject_code }}</strong></td>
+            <td>{{ s.subject_name }}</td>
+            <td>{{ s.tests_count }}</td>
+            <td><span class="badge badge-soft-primary fs-6">{{ s.avg_pct }}%</span></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4" class="text-center py-3 text-muted">No assessment data available.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const trend = {{ analytics.test_trend|tojson }};
+    if (trend.labels && trend.labels.length > 0) {
+      MITSCharts.createPerformanceTrendChart(
+        'studentPerfTrend',
+        trend.labels,
+        [{
+          label: '{{ student.name }} (%)',
+          data: trend.scores,
+          borderColor: '#2563EB',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          fill: true,
+          tension: 0.3
+        }]
+      );
+    }
+
+    const subPerf = {{ analytics.subject_performance|tojson }};
+    if (subPerf && subPerf.length > 0) {
+      const labels = subPerf.map(s => s.subject_code);
+      const avgs = subPerf.map(s => s.avg_pct);
+      MITSCharts.createSubjectAveragesChart('studentPerfSubject', labels, avgs);
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Predictive Final Grade Modelling{% endblock %}
+{% block page_subtitle %}Machine Learning forecasts based on continuous evaluations & attendance{% endblock %}
+
+{% block content %}
+<div class="card mb-4 shadow-sm border-primary border-opacity-25">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <h6 class="fw-bold text-primary mb-1"><i class="bi bi-cpu me-2"></i>Active Regressor: {{ metadata.model_name }}</h6>
+        <p class="text-muted small mb-0">Model Accuracy: MAE = <strong>{{ metadata.mae }}</strong>, R&sup2; Score = <strong>{{ metadata.r2_score }}</strong></p>
+      </div>
+      <span class="badge bg-light text-dark border">{{ metadata.data_source }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Roll No</th>
+          <th>Student Name</th>
+          <th>Semester</th>
+          <th>Mid-Term Avg</th>
+          <th>Attendance</th>
+          <th>Predicted Final %</th>
+          <th>Predicted Grade</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in predictions %}
+          <tr>
+            <td><strong>{{ p.roll_no }}</strong></td>
+            <td>{{ p.student_name }}</td>
+            <td>Sem {{ p.semester }}-{{ p.section }}</td>
+            <td>{{ p.midterm_avg }}%</td>
+            <td><span class="badge badge-soft-primary">{{ p.attendance_rate }}%</span></td>
+            <td><span class="fw-bold">{{ p.predicted_score }}%</span></td>
+            <td><span class="badge badge-soft-{{ p.badge_class }} px-3">Grade {{ p.predicted_grade }}</span></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="7" class="text-center py-4 text-muted">No grade predictions generated yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

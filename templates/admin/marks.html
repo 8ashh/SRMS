@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Assessment Marks Ledger{% endblock %}
+{% block page_subtitle %}Record and supervise student assessment test scores and percentages{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+  <!-- Left: Enter New Score Form -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white py-3">
+        <h5 class="fw-bold text-dark mb-0">
+          <i class="bi bi-pencil-square text-primary me-2"></i>Record Assessment Score
+        </h5>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('admin.marks') }}">
+          <!-- Student Selection -->
+          <div class="mb-3">
+            <label for="student_id" class="form-label fw-semibold text-secondary small">STUDENT <span class="text-danger">*</span></label>
+            <select class="form-select" id="student_id" name="student_id" required>
+              <option value="">Select Enrolled Student</option>
+              {% for s in students %}
+                <option value="{{ s.student_id }}">
+                  {{ s.roll_no }} - {{ s.name }} (Sem {{ s.semester }}-{{ s.section }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Subject Selection -->
+          <div class="mb-3">
+            <label for="subject_id" class="form-label fw-semibold text-secondary small">SUBJECT <span class="text-danger">*</span></label>
+            <select class="form-select" id="subject_id" name="subject_id" required>
+              <option value="">Select Academic Subject</option>
+              {% for sub in subjects %}
+                <option value="{{ sub.subject_id }}">
+                  {{ sub.code }} - {{ sub.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Test Number -->
+          <div class="mb-3">
+            <label for="test_no" class="form-label fw-semibold text-secondary small">TEST NUMBER <span class="text-danger">*</span></label>
+            <select class="form-select" id="test_no" name="test_no" required>
+              <option value="1">Test 1 (Mid-Term 1)</option>
+              <option value="2">Test 2 (Mid-Term 2)</option>
+              <option value="3">Test 3 (Pre-End Sem)</option>
+              <option value="4">Test 4 (Practical / Lab)</option>
+            </select>
+          </div>
+
+          <div class="row g-2 mb-4">
+            <!-- Obtained Marks -->
+            <div class="col-6">
+              <label for="score" class="form-label fw-semibold text-secondary small">OBTAINED <span class="text-danger">*</span></label>
+              <input type="number" step="0.5" min="0" class="form-control" id="score" name="score" placeholder="e.g. 38" required>
+            </div>
+            <!-- Maximum Marks -->
+            <div class="col-6">
+              <label for="max_score" class="form-label fw-semibold text-secondary small">MAXIMUM <span class="text-danger">*</span></label>
+              <input type="number" step="0.5" min="1" class="form-control" id="max_score" name="max_score" value="50" required>
+            </div>
+            <div class="col-12">
+              <small class="text-muted">Calculated: <code>Percentage = (Obtained / Maximum) &times; 100</code></small>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-navy w-100">
+            <i class="bi bi-save me-1"></i> Save Assessment Score
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Filter & Marks Ledger -->
+  <div class="col-lg-8">
+    <div class="card shadow-sm mb-3">
+      <div class="card-body p-3">
+        <!-- Filter Bar -->
+        <form method="GET" action="{{ url_for('admin.marks') }}" class="row g-2 align-items-center">
+          <div class="col-md-4">
+            <select class="form-select form-select-sm" name="subject_id">
+              <option value="">All Subjects</option>
+              {% for sub in subjects %}
+                <option value="{{ sub.subject_id }}" {% if selected_subject == sub.subject_id %}selected{% endif %}>
+                  {{ sub.code }} - {{ sub.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select form-select-sm" name="semester">
+              <option value="">All Semesters</option>
+              {% for sem in range(1, 9) %}
+                <option value="{{ sem }}" {% if selected_sem == sem|string %}selected{% endif %}>Sem {{ sem }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select form-select-sm" name="test_no">
+              <option value="">All Tests</option>
+              <option value="1" {% if selected_test == 1 %}selected{% endif %}>Test 1</option>
+              <option value="2" {% if selected_test == 2 %}selected{% endif %}>Test 2</option>
+              <option value="3" {% if selected_test == 3 %}selected{% endif %}>Test 3</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex gap-1">
+            <button type="submit" class="btn btn-sm btn-navy flex-grow-1"><i class="bi bi-funnel"></i></button>
+            <a href="{{ url_for('admin.marks') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Marks Table -->
+    <div class="card shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-custom table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Roll No</th>
+              <th>Student</th>
+              <th>Course</th>
+              <th>Test</th>
+              <th>Score / Max</th>
+              <th>Percentage</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if pagination.items %}
+              {% for m in pagination.items %}
+                <tr>
+                  <td><span class="fw-bold text-primary">{{ m.student.roll_no }}</span></td>
+                  <td>{{ m.student.name }}</td>
+                  <td><span class="badge bg-light text-dark border">{{ m.subject.code }}</span></td>
+                  <td>Test {{ m.test_no }}</td>
+                  <td><strong>{{ m.score }}</strong> / {{ m.max_score }}</td>
+                  <td>
+                    <span class="badge {% if m.percentage >= 75 %}badge-soft-success{% elif m.percentage >= PASSING_PERCENTAGE %}badge-soft-primary{% else %}badge-soft-danger{% endif %}">
+                      {{ m.percentage }}%
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editMarkModal{{ m.mark_id }}">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <form action="{{ url_for('admin.delete_mark', mark_id=m.mark_id) }}" method="POST" class="d-inline" onsubmit="return confirmDelete('Delete Test {{ m.test_no }} score for {{ m.student.name }}?');">
+                      <button type="submit" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+
+                <!-- Edit Modal -->
+                <div class="modal fade" id="editMarkModal{{ m.mark_id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="POST" action="{{ url_for('admin.edit_mark', mark_id=m.mark_id) }}">
+                        <div class="modal-header">
+                          <h5 class="modal-title fw-bold">Edit Score: {{ m.student.name }} ({{ m.subject.code }})</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="mb-3">
+                            <label class="form-label fw-semibold small">TEST NUMBER</label>
+                            <input type="number" min="1" class="form-control" name="test_no" value="{{ m.test_no }}" required>
+                          </div>
+                          <div class="row g-2">
+                            <div class="col-6">
+                              <label class="form-label fw-semibold small">OBTAINED SCORE</label>
+                              <input type="number" step="0.5" min="0" class="form-control" name="score" value="{{ m.score }}" required>
+                            </div>
+                            <div class="col-6">
+                              <label class="form-label fw-semibold small">MAXIMUM SCORE</label>
+                              <input type="number" step="0.5" min="1" class="form-control" name="max_score" value="{{ m.max_score }}" required>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                          <button type="submit" class="btn btn-primary btn-sm">Update Score</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="7" class="text-center py-4 text-muted">No marks records found for this selection.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer -->
+      {% if pagination.pages > 1 %}
+        <div class="card-footer bg-white d-flex align-items-center justify-content-between py-2">
+          <small class="text-muted">Page {{ pagination.page }} of {{ pagination.pages }}</small>
+          <ul class="pagination pagination-sm mb-0">
+            {% if pagination.has_prev %}
+              <li class="page-item"><a class="page-link" href="{{ url_for('admin.marks', page=pagination.prev_num, subject_id=selected_subject, semester=selected_sem, test_no=selected_test) }}">&laquo;</a></li>
+            {% endif %}
+            {% if pagination.has_next %}
+              <li class="page-item"><a class="page-link" href="{{ url_for('admin.marks', page=pagination.next_num, subject_id=selected_subject, semester=selected_sem, test_no=selected_test) }}">&raquo;</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

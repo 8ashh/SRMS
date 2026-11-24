@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Academic Early Warning Alerts{% endblock %}
+{% block page_subtitle %}Students requiring academic guidance and counseling{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm mb-4">
+  <div class="card-header bg-white d-flex align-items-center justify-content-between py-3">
+    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-exclamation-octagon text-danger me-2"></i>Active Risk Notifications</h5>
+    <span class="badge bg-light text-dark border">{{ alerts|length }} Alerts</span>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Roll No</th>
+          <th>Student</th>
+          <th>Subject</th>
+          <th>Score</th>
+          <th>Z-Score</th>
+          <th>Attendance</th>
+          <th>Risk Tier</th>
+          <th>Diagnostic Alert Reason</th>
+          <th class="text-end">Dossier</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if alerts %}
+          {% for a in alerts %}
+            <tr>
+              <td><strong>{{ a.roll_no }}</strong></td>
+              <td>{{ a.student_name }}</td>
+              <td>{{ a.subject_code }} (T{{ a.test_no }})</td>
+              <td>{{ a.current_score }}</td>
+              <td><code>{{ a.z_score }}</code></td>
+              <td><span class="badge badge-soft-primary">{{ a.attendance_pct }}</span></td>
+              <td><span class="badge badge-soft-{{ a.badge_color }}">{{ a.risk_level }}</span></td>
+              <td><small class="text-muted">{{ a.reason }}</small></td>
+              <td class="text-end">
+                <a href="{{ url_for('faculty.student_profile', student_id=a.student_id) }}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="9" class="text-center py-4 text-muted">No students currently in risk categories.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
